@@ -1,5 +1,9 @@
 # Imagen base (elige versión según tu hosting)
 FROM php:8.4-apache
+#crear un usuario
+RUN groupadd -g 1000 laravel \
+ && useradd -u 1000 -g laravel -m laravel
+
 
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
