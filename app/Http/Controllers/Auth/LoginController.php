@@ -1,43 +1,65 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use Illuminate\Validation\ValidationException;
 class LoginController extends Controller
 {
-     public function showLogin()
+    public function showLogin()
     {
         return view('auth.login');
     }
-
     public function ingresar(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        try {
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $credentials = $request->validate([
+                'usuario' => ['required', 'string'],
+                'password' => ['required'],
+            ]);
+
+            if (!Auth::attempt($credentials, $request->boolean('remember'))) {
+                throw new Exception('Credenciales incorrectas.');
+            }
 
             $request->session()->regenerate();
 
-            return redirect()->intended('/admin');
-        }
+            $this->mensaje('success', 'Iniciando correctamente...');
+            return response()->json($this->mensaje, 200);
 
-        return back()->withErrors([
-            'email' => 'Credenciales incorrectas.',
-        ])->onlyInput('email');
+        } catch (ValidationException $e) {
+
+            return response()->json([
+                'tipo' => 'error',
+                'mensaje' => 'Todos los campos son requeridos...',
+            ], 200);
+
+        } catch (\Exception $e) {
+
+            $this->mensaje('error', $e->getMessage());
+
+            return response()->json($this->mensaje, 200);
+        }
     }
 
-     public function salir(Request $request)
+    public function salir(Request $request)
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(['tipo'=>'success','mensaje'=>'Cerrando sesion...']);
+        return response()->json(['tipo' => 'success', 'mensaje' => 'Cerrando sesion...']);
+    }
+
+    public function mensaje($titulo, $mensaje)
+    {
+        $this->mensaje = [
+            'tipo' => $titulo,
+            'mensaje' => $mensaje,
+        ];
     }
 }

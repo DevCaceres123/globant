@@ -1,7 +1,9 @@
 @extends('adminlte::page')
 
 @section('title', 'Panel de control')
-
+@push('css')
+    @include('administrador.plantilla_admin.style')
+@endpush
 
 @section('content_header')
 <h1 class="text-center">PANEL DE ADMINISTRACION GLOBANT SRL</h1>

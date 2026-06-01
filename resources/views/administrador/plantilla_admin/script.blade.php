@@ -16,7 +16,20 @@
                 await cerrar_session_cam();
 
             } else {
-                alert("Se canceló la eliminacion");
+                 Swal.mixin({
+                toast: !0,
+                position: "top-end",
+                showConfirmButton: !1,
+                timer: 1500,
+                timerProgressBar: !0,
+                didOpen: e => {
+                    e.addEventListener("mouseenter", Swal.stopTimer), e.addEventListener("mouseleave", Swal
+                        .resumeTimer)
+                }
+            }).fire({
+                icon: 'info',
+                title: 'Cancelado....!!',
+            })
             }
         });
     });
