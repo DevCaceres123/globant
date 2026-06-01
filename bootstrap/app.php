@@ -10,6 +10,11 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withMiddleware(function ($middleware) {
+
+    $middleware->redirectUsersTo('/admin');
+
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         //
     })

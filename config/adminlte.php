@@ -334,19 +334,29 @@ return [
             'submenu' => [
                 [
                     'text' => 'Usuarios',
+                    'icon_color' => 'green',
                     'url' => '#',
                 ],
-                
+
                 [
                     'text' => 'Roles',
+                    'icon_color' => 'green',
                     'url' => '#',
                 ],
 
                 [
                     'text' => 'Permisos',
+                    'icon_color' => 'green',
                     'url' => '#',
                 ],
             ],
+        ],
+
+        [
+            'text' => 'Salir',            
+            'icon' => 'fas fa-sign-out-alt',
+            'id' => 'logout-btn',
+            'url' => '#',
         ],
         // [
         //     'text' => 'profile',
@@ -450,7 +460,7 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
@@ -495,12 +505,12 @@ return [
             ],
         ],
         'Sweetalert2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@8',
+                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@11',
                 ],
             ],
         ],

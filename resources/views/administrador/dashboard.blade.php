@@ -2,9 +2,6 @@
 
 @section('title', 'Panel de control')
 
-<!-- @section('css')
-<link rel="stylesheet" href="/css/custom.css">
-@stop -->
 
 @section('content_header')
 <h1 class="text-center">PANEL DE ADMINISTRACION GLOBANT SRL</h1>
@@ -20,10 +17,11 @@
         <i class="fas fa-users"></i>
     </div>
 </div>
-@stop
 
-<!-- @section('js')
-<script>
-    console.log('Hola AdminLTE');
-</script>
-@stop -->
+
+@include('administrador.plantilla_admin.salir')
+
+@stop
+@push('js')
+    @include('administrador.plantilla_admin.script')
+@endpush
