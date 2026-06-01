@@ -1,40 +1,29 @@
-<script>
-    //para cerrar la session
+<script type="module">
+    /* =========================================================
+       CERRAR SESIÓN
+       (usa el helper modular de mensajes: mensajes.js)
+       ========================================================= */
+    import { mensajeAlerta } from "{{ asset('funciones_helper/notificaciones/mensajes.js') }}";
 
-    document.getElementById('logout-btn').addEventListener('click', function (e) {
-        Swal.fire({
+    document.getElementById('logout-btn').addEventListener('click', async function (e) {
+        const resultado = await Swal.fire({
             title: "NOTA!",
-            text: "¿Está seguro de Eliminar la carrera?",
+            text: "¿Está seguro de cerrar la sesión?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Sí, Estoy seguro",
+            confirmButtonText: "Sí, estoy seguro",
             cancelButtonText: "Cancelar",
-        }).then(async function (result) {
-            if (result.isConfirmed) {
-                await cerrar_session_cam();
-
-            } else {
-                 Swal.mixin({
-                toast: !0,
-                position: "top-end",
-                showConfirmButton: !1,
-                timer: 1500,
-                timerProgressBar: !0,
-                didOpen: e => {
-                    e.addEventListener("mouseenter", Swal.stopTimer), e.addEventListener("mouseleave", Swal
-                        .resumeTimer)
-                }
-            }).fire({
-                icon: 'info',
-                title: 'Cancelado....!!',
-            })
-            }
         });
+
+        if (resultado.isConfirmed) {
+            await cerrar_session_cam();
+        } else {
+            mensajeAlerta('Cancelado....!!', 'info');
+        }
     });
 
-    //PARA CERRAR LA SESION
     async function cerrar_session_cam() {
         let datos = Object.fromEntries(new FormData(document.getElementById('formulario_salir')).entries());
         try {
@@ -46,20 +35,7 @@
                 body: JSON.stringify(datos)
             });
             let dato = await respuesta.json();
-            Swal.mixin({
-                toast: !0,
-                position: "top-end",
-                showConfirmButton: !1,
-                timer: 1500,
-                timerProgressBar: !0,
-                didOpen: e => {
-                    e.addEventListener("mouseenter", Swal.stopTimer), e.addEventListener("mouseleave", Swal
-                        .resumeTimer)
-                }
-            }).fire({
-                icon: dato.tipo,
-                title: dato.mensaje,
-            })
+            mensajeAlerta(dato.mensaje, dato.tipo);
             setTimeout(() => {
                 location.reload();
             }, 1500);
@@ -69,10 +45,10 @@
     }
 </script>
 
-
-
 <script>
-    // Configuración global de DataTables en español
+    /* =========================================================
+       CONFIGURACIÓN GLOBAL DE DATATABLES (español)
+       ========================================================= */
     $.extend(true, $.fn.dataTable.defaults, {
         language: {
             processing:     "Procesando...",

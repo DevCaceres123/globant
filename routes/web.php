@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Administrador\Usuario\UsuarioController;
 
 
 Route::get('/', function () {
@@ -27,10 +28,15 @@ Route::prefix('/admin')->middleware('auth')->group(function () {
     Route::get('/', function () {
         return view('administrador.dashboard');
     });
-
     //Ruta de LOGIN cuando SI estamos logeados
     Route::controller(LoginController::class)->group(function () {
         Route::post('salir', 'salir')->name('salir');        
+    });
+
+
+    //Ruta para el modulo de administradores
+    Route::controller(UsuarioController::class)->group(function () {
+        Route::get('usuarios', 'index')->name('usuarios');        
     });
 });
 
