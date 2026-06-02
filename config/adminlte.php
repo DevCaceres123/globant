@@ -327,6 +327,12 @@ return [
         //     'label' => 4,
         //     'label_color' => 'success',
         // ],
+        ['header' => 'RESUMEN'],
+        [
+            'text' => 'INICIO',
+            'url' => '/admin',
+            'icon' => 'fas fa-home',
+        ],
         ['header' => 'SEGURIDAD'],
         [
             'text' => 'ADMINISTRADOR',
