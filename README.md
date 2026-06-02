@@ -1,59 +1,196 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 Sistema de Afiliados — Globant SRL
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Panel de administración construido con **Laravel 12**, **AdminLTE 3** y **Spatie Permission** (roles y permisos). El front se compila con **Vite + Tailwind CSS 4**.
 
-## About Laravel
+Este proyecto está configurado para ejecutarse utilizando Docker, permitiendo un entorno de desarrollo consistente para todo el equipo.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🧰 Requisitos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Antes de comenzar, asegúrate de tener instalado:
 
-## Learning Laravel
+* Git
+* Docker (Docker Desktop o Docker Engine)
+* Docker Compose
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+****** IMPORTANTE *******
 
-## Laravel Sponsors
+`sudo usermod -aG docker $USER`  // `$USER` es tu usuario; este comando sirve para tener acceso a Docker sin ser usuario root. Ejecutarlo si usas Linux.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+`git config --global core.fileMode false` // ejecútalo para no tener problemas con la configuración de permisos que da Docker (Linux o Windows).
 
-### Premium Partners
+`sudo chown -R usuario:grupo .`  // si tienes problemas con los permisos ejecuta este comando, solo en Linux.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 📥 Instalación del proyecto
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Clonar el repositorio
 
-## Code of Conduct
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd afiliados-app
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+### 2. Configurar variables de entorno
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Windows:** haz una copia del archivo `.env.example` y renómbrala como `.env`
 
-## License
+**Linux:**
+```bash
+cp .env.example .env
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Edita el archivo `.env` y configura la base de datos. El **host debe ser `db`**, que es el nombre del servicio en `docker-compose.yml`:
+
+```env
+DB_CONNECTION=mysql        # mysql como motor de base de datos
+DB_HOST=db                 # nombre del servicio de la BD en docker-compose.yml
+DB_PORT=3306               # puerto de la base de datos
+DB_DATABASE=afiliados      # nombre de la base de datos
+DB_USERNAME=afiliados      # usuario de la base de datos
+DB_PASSWORD=secret         # contraseña del usuario
+DB_ROOT_PASSWORD=root_secret   # contraseña root (¡no la compartas!)
+```
+
+---
+
+### 3. Levantar los contenedores
+
+```bash
+docker compose up -d --build
+```
+
+Esto iniciará los servicios necesarios:
+
+* PHP + Apache
+* Base de datos (MariaDB)
+
+---
+
+### 4. Instalar dependencias de Laravel
+
+```bash
+docker compose exec app composer install
+```
+
+---
+
+### 5. Generar la clave de la aplicación
+
+```bash
+docker compose exec app php artisan key:generate
+```
+
+---
+
+### 6. Ejecutar migraciones y sembrar datos iniciales
+
+Crea las tablas y carga el rol `administrador` junto con el usuario inicial:
+
+```bash
+docker compose exec app php artisan migrate --seed
+```
+
+---
+
+### 7. Instalar y compilar el front (Vite + Tailwind)
+
+```bash
+docker compose exec app npm install
+docker compose exec app npm run build
+```
+
+---
+
+## 🌐 Acceso al sistema
+
+Una vez completados los pasos anteriores, puedes acceder al proyecto en:
+
+```
+http://localhost:8080
+```
+
+### 🔑 Credenciales por defecto
+
+| Usuario | Contraseña |
+|---------|-----------|
+| `admin` | `1234` |
+
+> ⚠️ El inicio de sesión es **por nombre de usuario** (campo `usuario`), no por correo. Cambia esta contraseña en producción.
+
+¡Listo! 🎉 Ahora puedes empezar a trabajar en el sistema 🚀
+
+---
+
+## 🔄 Flujo de trabajo diario
+
+Cada vez que haya actualizaciones en el proyecto:
+
+```bash
+git pull origin {nombre de rama}
+docker compose exec app composer install
+docker compose exec app php artisan migrate
+docker compose exec app npm run build
+```
+
+---
+
+## 🛠️ Comandos útiles
+
+### Ver contenedores en ejecución
+```bash
+docker compose ps
+```
+
+### Detener contenedores
+```bash
+docker compose stop
+```
+
+### Reconstruir contenedores
+```bash
+docker compose up -d --build      # agrega -v si quieres eliminar también la base de datos
+```
+
+### Limpiar caché de vistas (si no ves cambios de diseño)
+```bash
+docker compose exec app php artisan view:clear
+```
+
+### Recompilar / desarrollo del front en caliente
+```bash
+docker compose exec app npm run dev
+```
+
+---
+
+## ⚠️ Notas importantes
+
+* La carpeta `vendor/` se genera con `composer install`.
+* Si hay cambios en dependencias (`composer.json` o `composer.lock`), vuelve a ejecutar:
+  ```bash
+  docker compose exec app composer install
+  ```
+* Si cambian los assets del front (`resources/`), recompila con `npm run build`.
+* La base de datos se mantiene persistente gracias a los volúmenes de Docker.
+
+---
+
+## 🧩 Stack
+
+* **Backend:** Laravel 12 (PHP 8.2+)
+* **Roles y permisos:** spatie/laravel-permission
+* **UI:** AdminLTE 3 (Blade)
+* **Build front:** Vite + Tailwind CSS 4
+* **Base de datos:** MariaDB 11.3 / MySQL
+
+---
+
+## 🎯 Objetivo
+
+Este entorno permite que cualquier desarrollador pueda levantar el proyecto rápidamente sin preocuparse por configuraciones locales de PHP, Apache o base de datos.
