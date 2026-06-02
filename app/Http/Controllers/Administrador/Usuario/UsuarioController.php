@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Administrador\Usuario;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+//librerias de el contralador
+use Exception;
+use App\Models\User;
+
 class UsuarioController extends Controller
 {
     /**
@@ -12,7 +16,47 @@ class UsuarioController extends Controller
      */
     public function index()
     {
+        // if (!auth()->user()->can('sede.inicio')) {
+        //     return redirect()->route('inicio');
+        // }
         return view('administrador.administrador.usuario');
+    }
+
+
+    public function listarUsuarios(Request $request)
+    {
+        $query = User::with(['roles'])->select('id', 'usuario', 'ci', 'nombres', 'apellidos', 'estado', 'email')->orderBy('id', 'desc');
+
+        if (!empty($request->search['value'])) {
+            $query->where(function ($q) use ($request) {
+                $q->where('ci', 'like', '%' . $request->search['value'] . '%')->orWhere('usuario', 'like', '%' . $request->search['value'] . '%')->orWhere
+                ('nombres', 'like', '%' . $request->search['value'] . '%')->orWhere
+                ('apellidos', 'like', '%' . $request->search['value'] . '%')
+                ->orWhereHas('roles', function ($rolQuery) use ($request) {
+                    $rolQuery->where('name', 'like', '%' . $request->search['value'] . '%');
+                });
+            });
+        }
+
+        // Total de registros antes del filtrado
+        $recordsTotal = $query->count();
+
+        // Paginación y orden
+        $sedes = $query->skip($request->start)->take($request->length)->get();
+
+        // Respuesta
+        return response()->json([
+            'draw' => $request->draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsTotal, // Ajustar si hay filtros
+            'data' => $sedes,
+            'permisos' => [
+                'editar' => auth()->user()->can('sede.editar'),
+                'eliminar' => true,
+                'estado' => auth()->user()->can('sede.desactivar'),
+                
+            ],
+        ]);
     }
 
     /**
@@ -28,7 +72,7 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
     }
 
     /**
@@ -36,7 +80,7 @@ class UsuarioController extends Controller
      */
     public function show(string $id)
     {
-        //
+
     }
 
     /**

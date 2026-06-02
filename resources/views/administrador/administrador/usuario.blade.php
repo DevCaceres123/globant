@@ -83,9 +83,9 @@
                 <thead>
                     <tr>
                         <th style="width: 40px">#</th>
-                        <th>Usuario</th>
+                        <th>Nombre Completo</th>
                         <th>CI</th>
-                        <th>Nombre de acceso</th>
+                        <th>Acceso</th>
                         <th>Rol</th>
                         <th class="text-center" style="width: 100px">Estado</th>
                         <th class="text-center" style="width: 110px">Acciones</th>

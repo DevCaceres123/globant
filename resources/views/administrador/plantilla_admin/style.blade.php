@@ -233,6 +233,28 @@
     .input-group-text { background: #faf7f5; border-color: var(--line); color: var(--wine); }
     .form-control:focus,
     .custom-select:focus { border-color: var(--wine); box-shadow: 0 0 0 .15rem rgba(123,34,51,.15); }
+
+    /* ---- Switch (custom-switch) en vino ---- */
+    .custom-control-input:checked ~ .custom-control-label::before {
+        background-color: var(--wine); border-color: var(--wine);
+    }
+    .custom-control-input:focus ~ .custom-control-label::before {
+        box-shadow: 0 0 0 .15rem rgba(123,34,51,.20);
+    }
+    /* Variante grande */
+    .custom-switch-lg { padding-left: 2.85rem; }
+    .custom-switch-lg .custom-control-label { line-height: 1.6rem; padding-left: .4rem; }
+    .custom-switch-lg .custom-control-label::before {
+        left: -2.85rem; top: .15rem;
+        height: 1.5rem; width: 2.6rem; border-radius: 1rem;
+    }
+    .custom-switch-lg .custom-control-label::after {
+        top: calc(.15rem + 3px); left: calc(-2.85rem + 3px);
+        height: calc(1.5rem - 6px); width: calc(1.5rem - 6px); border-radius: 50%;
+    }
+    .custom-switch-lg .custom-control-input:checked ~ .custom-control-label::after {
+        transform: translateX(1.1rem);
+    }
 </style>
 
 <meta name="csrf-token" content="{{ csrf_token() }}">

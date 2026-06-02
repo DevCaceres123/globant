@@ -34,9 +34,12 @@ Route::prefix('/admin')->middleware('auth')->group(function () {
     });
 
 
-    //Ruta para el modulo de administradores
+    //RUTAS PARA EL MODULO DE ADMINISTRADORES
+
+    //Ruta para los usuarios
     Route::controller(UsuarioController::class)->group(function () {
         Route::get('usuarios', 'index')->name('usuarios');        
-    });
+        Route::get('listarUsuarios', 'listarUsuarios')->name('listarUsuarios');        
+    }); 
 });
 
