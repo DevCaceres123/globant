@@ -1,6 +1,6 @@
 # 🚀 Sistema de Afiliados — Globant SRL
 
-Panel de administración construido con **Laravel 12**, **AdminLTE 3** y **Spatie Permission** (roles y permisos). El front se compila con **Vite + Tailwind CSS 4**.
+Panel de administración construido con **Laravel 12**, **AdminLTE 3** y **Spatie Permission** (roles y permisos).
 
 Este proyecto está configurado para ejecutarse utilizando Docker, permitiendo un entorno de desarrollo consistente para todo el equipo.
 
@@ -72,8 +72,19 @@ Esto iniciará los servicios necesarios:
 
 ---
 
+> 🐧➡️🪟 **Importante (Linux vs. Windows):** en **Linux**, los comandos que generan o modifican
+> archivos se ejecutan con **`-u laravel`** (el usuario `laravel` del contenedor tiene UID 1000,
+> igual que tu usuario en el host); así los archivos creados (`vendor/`, cachés, migraciones, etc.)
+> quedan con **tu usuario** y no con `root`, evitando tener que usar `sudo` después.
+> En **Windows** esto **no** es necesario, por lo que el `-u laravel` se omite.
+
 ### 4. Instalar dependencias de Laravel
 
+**Linux:**
+```bash
+docker compose exec -u laravel app composer install
+```
+**Windows:**
 ```bash
 docker compose exec app composer install
 ```
@@ -82,6 +93,11 @@ docker compose exec app composer install
 
 ### 5. Generar la clave de la aplicación
 
+**Linux:**
+```bash
+docker compose exec -u laravel app php artisan key:generate
+```
+**Windows:**
 ```bash
 docker compose exec app php artisan key:generate
 ```
@@ -92,17 +108,13 @@ docker compose exec app php artisan key:generate
 
 Crea las tablas y carga el rol `administrador` junto con el usuario inicial:
 
+**Linux:**
+```bash
+docker compose exec -u laravel app php artisan migrate --seed
+```
+**Windows:**
 ```bash
 docker compose exec app php artisan migrate --seed
-```
-
----
-
-### 7. Instalar y compilar el front (Vite + Tailwind)
-
-```bash
-docker compose exec app npm install
-docker compose exec app npm run build
 ```
 
 ---
@@ -131,11 +143,17 @@ http://localhost:8080
 
 Cada vez que haya actualizaciones en el proyecto:
 
+**Linux:**
+```bash
+git pull origin {nombre de rama}
+docker compose exec -u laravel app composer install
+docker compose exec -u laravel app php artisan migrate
+```
+**Windows:**
 ```bash
 git pull origin {nombre de rama}
 docker compose exec app composer install
 docker compose exec app php artisan migrate
-docker compose exec app npm run build
 ```
 
 ---
@@ -162,21 +180,13 @@ docker compose up -d --build      # agrega -v si quieres eliminar también la ba
 docker compose exec app php artisan view:clear
 ```
 
-### Recompilar / desarrollo del front en caliente
-```bash
-docker compose exec app npm run dev
-```
-
 ---
 
 ## ⚠️ Notas importantes
 
 * La carpeta `vendor/` se genera con `composer install`.
-* Si hay cambios en dependencias (`composer.json` o `composer.lock`), vuelve a ejecutar:
-  ```bash
-  docker compose exec app composer install
-  ```
-* Si cambian los assets del front (`resources/`), recompila con `npm run build`.
+* Si hay cambios en dependencias (`composer.json` o `composer.lock`), vuelve a ejecutar `composer install`
+  (en Linux con `-u laravel`, en Windows sin él).
 * La base de datos se mantiene persistente gracias a los volúmenes de Docker.
 
 ---
@@ -185,8 +195,7 @@ docker compose exec app npm run dev
 
 * **Backend:** Laravel 12 (PHP 8.2+)
 * **Roles y permisos:** spatie/laravel-permission
-* **UI:** AdminLTE 3 (Blade)
-* **Build front:** Vite + Tailwind CSS 4
+* **UI:** AdminLTE 3 (Blade + Bootstrap 4)
 * **Base de datos:** MariaDB 11.3 / MySQL
 
 ---
