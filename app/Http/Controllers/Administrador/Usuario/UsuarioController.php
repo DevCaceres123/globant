@@ -5,21 +5,31 @@ namespace App\Http\Controllers\Administrador\Usuario;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-//librerias de el contralador
+//librerias que se usan en este controlador
 use Exception;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class UsuarioController extends Controller
+class UsuarioController extends Controller implements HasMiddleware
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public static function middleware(): array
+    {
+        // return [
+        //     new Middleware('permission:usuario.listar', only: ['index', 'listarUsuarios']),
+        //     new Middleware('permission:usuario.crear',  only: ['store']),
+        //     new Middleware('permission:usuario.editar', only: ['update']),
+        //     new Middleware('permission:usuario.eliminar', only: ['destroy']),
+        // ];
+
+        return [];
+    }
+
+
     public function index()
     {
-        // if (!auth()->user()->can('sede.inicio')) {
-        //     return redirect()->route('inicio');
-        // }
+      
         return view('administrador.administrador.usuario');
     }
 
@@ -120,6 +130,36 @@ class UsuarioController extends Controller
             DB::commit();
 
             $this->mensaje('exito', "El registro fue eliminado correctamente");
+            return response()->json($this->mensaje, 200);
+        } catch (Exception $e) {
+
+            DB::rollBack();
+            $this->mensaje("error", "Error " . $e->getMessage());
+
+            return response()->json($this->mensaje, 200);
+        }
+    }
+
+
+    public function actualizarEstado(string $id ,Request $request)
+    {
+
+        try {           
+
+            $usuario = User::find($id);
+
+            if (!$usuario) {
+                throw new Exception("no existe el usuario");
+            }
+
+            DB::beginTransaction();
+
+            $usuario->estado = $request->estado;
+            $usuario->save();
+
+            DB::commit();
+
+            $this->mensaje('exito', "El estado del usuario fue actualizado correctamente");
             return response()->json($this->mensaje, 200);
         } catch (Exception $e) {
 

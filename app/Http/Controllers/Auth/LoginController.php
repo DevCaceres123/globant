@@ -20,7 +20,7 @@ class LoginController extends Controller
                 'usuario' => ['required', 'string'],
                 'password' => ['required'],
             ]);
-
+            $credentials['estado'] = 'activo';
             if (!Auth::attempt($credentials, $request->boolean('remember'))) {
                 throw new Exception('Credenciales incorrectas.');
             }

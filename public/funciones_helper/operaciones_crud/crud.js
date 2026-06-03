@@ -21,7 +21,10 @@ export async function crud(url, metodo, idRegistro = null, datos = null, callbac
             .querySelector('meta[name="csrf-token"]')
             .getAttribute("content");
 
-        const headers = { "X-CSRF-TOKEN": csrfToken };
+        const headers = {
+            "X-CSRF-TOKEN": csrfToken,
+            "Accept": "application/json",
+        };
         const esFormData = datos instanceof FormData;
 
         // Construir la URI final
@@ -55,8 +58,8 @@ export async function crud(url, metodo, idRegistro = null, datos = null, callbac
             body,
         });
 
-        // 422 se deja pasar para que el callback maneje los errores de validación
-        if (!response.ok && response.status !== 422) {
+        // 422 (validación) y 403 (sin permiso) se dejan pasar para que el callback maneje el JSON
+        if (!response.ok && response.status !== 422 && response.status !== 403) {
             throw new Error(`Error del servidor: ${response.status}`);
         }
 

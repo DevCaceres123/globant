@@ -96,6 +96,46 @@ export const validarCamposDelFormulario = (expresion, input, mensaje, campo) => 
 }
 
 
+/**
+ * Valida el tipo y tamaño de un archivo antes de subirlo.
+ *
+ * @param {File}     archivo               - Objeto File del input (input.files[0])
+ * @param {string[]} extensionesPermitidas - Extensiones válidas sin punto  (ej: ['pdf','jpg','png'])
+ * @param {number}   maxMB                 - Tamaño máximo permitido en MB (0 = sin límite)
+ * @returns {{ valido: boolean, mensaje: string }}
+ *
+ * Ejemplo:
+ *   const { valido, mensaje } = validarArchivo(input.files[0], ['pdf','docx'], 5);
+ *   if (!valido) { mensajeAlerta(mensaje, 'error'); return; }
+ */
+export function validarArchivo(archivo, extensionesPermitidas = [], maxMB = 0) {
+    if (!archivo) {
+        return { valido: false, mensaje: 'No se seleccionó ningún archivo.' };
+    }
+
+    const extension = archivo.name.split('.').pop().toLowerCase();
+    const permitidas = extensionesPermitidas.map(e => e.toLowerCase());
+
+    if (permitidas.length > 0 && !permitidas.includes(extension)) {
+        return {
+            valido: false,
+            mensaje: `Tipo de archivo no permitido (.${extension}). Se aceptan: ${permitidas.map(e => '.'+e).join(', ')}.`,
+        };
+    }
+
+    if (maxMB > 0) {
+        const pesoMB = archivo.size / (1024 * 1024);
+        if (pesoMB > maxMB) {
+            return {
+                valido: false,
+                mensaje: `El archivo pesa ${pesoMB.toFixed(1)} MB. El máximo permitido es ${maxMB} MB.`,
+            };
+        }
+    }
+
+    return { valido: true, mensaje: '' };
+}
+
 export const verificarCamposDelFormulario = (camposDelFormulario) => {
 
     let contadorCamposCorrectos=0;

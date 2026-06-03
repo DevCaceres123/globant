@@ -93,7 +93,7 @@
                 </thead>
                 <tbody>
                     {{-- Filas de ejemplo para visualizar el diseño. Reemplazar por @foreach($usuarios as $usuario) --}}
-                    <tr>
+                    {{-- <tr>
                         <td>1</td>
                         <td>
                             <div class="celda-usuario">
@@ -146,7 +146,7 @@
                                 </button>
                             </div>
                         </td>
-                    </tr>
+                    </tr> --}}
                 </tbody>
             </table>
         </div>
@@ -237,7 +237,7 @@
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-key"></i></span></div>
                                         <input type="password" class="form-control" name="password" id="password" placeholder="Ingrese la contraseña">
-                                        <div class="input-group-append" onclick="togglePassword()" style="cursor:pointer">
+                                        <div class="input-group-append" id="toggle_password" style="cursor:pointer">
                                             <span class="input-group-text"><i class="fas fa-eye-slash" id="icono_password"></i></span>
                                         </div>
                                     </div>

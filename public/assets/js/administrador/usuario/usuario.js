@@ -1,8 +1,10 @@
 import { mensajeAlerta, toast } from "../../../../funciones_helper/notificaciones/mensajes.js";
 import { crud } from "../../../../funciones_helper/operaciones_crud/crud.js";
+import { mostrarCarga, ocultarCarga } from "../../../../funciones_helper/vistas/preloader.js";
 import {
     vaciar_errores,
     vaciar_formulario,
+    toggleContrasenia,
 } from "../../../../funciones_helper/vistas/formulario.js";
 
 let permisosGlobal;
@@ -135,18 +137,28 @@ function listar_datos() {
     });
 }
 
-// Llamada a la función para recargar la tabla después de una operación
-function actualizarTabla() {
-    tabla.ajax.reload(null, false); // Recarga los datos sin resetear el paginado
+function actualizarTabla(callback = null) {
+    tabla.ajax.reload(function () {
+        ocultarCarga('.card');
+        if (callback) callback();
+    }, false);
 }
 
 /* =========================================================
    MODAL: nuevo usuario / mostrar contraseña / switch estado
    ========================================================= */
 
+document.getElementById('toggle_password').addEventListener('click', () => {
+    toggleContrasenia('password', 'icono_password');
+});
 
 
-// ELIMINAR REGISTRO
+
+
+/* =========================================================
+   FUNCION: para eliminar usuario
+   ========================================================= */
+
 $('#tabla_usuarios').on('click', '.eliminar_usuario', function (e) {
 
     e.preventDefault(); // Evitar que el enlace recargue la página
@@ -165,13 +177,16 @@ $('#tabla_usuarios').on('click', '.eliminar_usuario', function (e) {
     }).then(async function (result) {
         if (result.isConfirmed) {
 
+            mostrarCarga('.card');
             crud("admin/usuario", "DELETE", id_registro, null, function (error, response) {
 
                 if (error) {
+                    ocultarCarga('.card');
                     mensajeAlerta("Ocurrió un error al eliminar el registro", "error");
                     return;
                 }
                 if (response.tipo != "exito") {
+                    ocultarCarga('.card');
                     mensajeAlerta(response.mensaje, response.tipo);
                     return;
                 }
@@ -182,4 +197,35 @@ $('#tabla_usuarios').on('click', '.eliminar_usuario', function (e) {
             toast('info', 'Se canceló la operación');
         }
     })
+});
+
+
+/* =========================================================
+   FUNCION: para desactivar/activar usuario
+   ========================================================= */
+
+$('#tabla_usuarios').on('click', '.cambiar_estado_usuario', function (e) {
+
+    const contenedor = $(this).closest('.cambiar_estado_usuario');
+    let id_registro = contenedor.data('id');
+    let estadoActual = contenedor.data('estado');
+
+    let nuevoEstado = estadoActual === 'activo' ? 'inactivo' : 'activo';
+
+    mostrarCarga('.card');
+    crud("admin/actualizarEstado", "PATCH", id_registro, { estado: nuevoEstado }, function (error, response) {
+
+        if (error) {
+            ocultarCarga('.card');
+            mensajeAlerta("Ocurrió un error al cambiar el estado del usuario", "error");
+            return;
+        }
+        if (response.tipo != "exito") {
+            ocultarCarga('.card');
+            mensajeAlerta(response.mensaje, response.tipo);
+            return;
+        }
+        mensajeAlerta(response.mensaje, response.tipo);
+        actualizarTabla();
+    });
 });
