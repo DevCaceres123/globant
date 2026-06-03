@@ -1,153 +1,74 @@
-export async function crud(
-    url,
-    metodo,
-    idRegistro = null,
-    datos = null,
-    callback
-) {
-    let response;
+/**
+ * Función central para comunicación asíncrona con el servidor.
+ *
+ * @param {string}   url        - Ruta sin slash inicial (ej: "admin/usuario")
+ * @param {string}   metodo     - Método HTTP: GET | POST | PUT | PATCH | DELETE
+ * @param {*}        idRegistro - ID del recurso (null para colecciones)
+ * @param {Object|FormData|null} datos - Cuerpo de la petición (null para GET/DELETE)
+ * @param {Function} callback   - function(error, response) — siempre verificar error primero
+ *
+ * Casos de uso:
+ *   crud("admin/usuario", "GET",    null, null,   cb)  → GET    /admin/usuario
+ *   crud("admin/usuario", "GET",    5,    null,   cb)  → GET    /admin/usuario/5
+ *   crud("admin/usuario", "POST",   null, datos,  cb)  → POST   /admin/usuario
+ *   crud("admin/usuario", "PUT",    5,    datos,  cb)  → PUT    /admin/usuario/5  (o POST+_method si es FormData)
+ *   crud("admin/usuario", "PATCH",  5,    datos,  cb)  → PATCH  /admin/usuario/5  (o POST+_method si es FormData)
+ *   crud("admin/usuario", "DELETE", 5,    null,   cb)  → DELETE /admin/usuario/5
+ */
+export async function crud(url, metodo, idRegistro = null, datos = null, callback) {
     try {
         const csrfToken = document
             .querySelector('meta[name="csrf-token"]')
             .getAttribute("content");
 
-        const headers = {
-            "X-CSRF-TOKEN": csrfToken,
-        };
-
-        // Detectar si datos es FormData para evitar fijar Content-Type manualmente
+        const headers = { "X-CSRF-TOKEN": csrfToken };
         const esFormData = datos instanceof FormData;
 
-        // PUT
-        if (idRegistro != null && datos != null && metodo === "PUT") {
-            if (!esFormData) {
-                headers["Content-Type"] = "application/json";
+        // Construir la URI final
+        const uri = idRegistro != null ? `/${url}/${idRegistro}` : `/${url}`;
+
+        // PHP no puede leer multipart/form-data en PUT ni PATCH.
+        // Solución: enviar como POST con el campo _method para que Laravel haga el spoofing.
+        let metodoReal = metodo;
+        if (esFormData && (metodo === "PUT" || metodo === "PATCH")) {
+            if (!datos.has("_method")) {
+                datos.append("_method", metodo);
             }
-            response = await fetch(`/${url}/${idRegistro}`, {
-                method: metodo,
-                headers: headers,
-                body: esFormData ? datos : JSON.stringify(datos),
-            });
+            metodoReal = "POST";
         }
 
-        // POST
-        if (datos != null && metodo === "POST") {
-            if (!esFormData) {
+        // Preparar el body y Content-Type
+        let body = null;
+        if (datos !== null) {
+            if (esFormData) {
+                // No fijar Content-Type: el browser lo establece automáticamente con el boundary
+                body = datos;
+            } else {
                 headers["Content-Type"] = "application/json";
+                body = JSON.stringify(datos);
             }
-            response = await fetch(
-                `/${url}${idRegistro != null ? `/${idRegistro}` : ""}`,
-                {
-                    method: metodo,
-                    headers: headers,
-                    body: esFormData ? datos : JSON.stringify(datos),
-                }
-            );
         }
 
-        // GET con id
-        if (idRegistro != null && datos == null) {
-            headers["Content-Type"] = "application/json";
-            response = await fetch(`/${url}/${idRegistro}`, {
-                method: metodo,
-                headers: headers,
-            });
-        }
+        const response = await fetch(uri, {
+            method: metodoReal,
+            headers,
+            body,
+        });
 
-        // GET index
-        if (datos == null && idRegistro == null) {
-            headers["Content-Type"] = "application/json";
-            response = await fetch(`/${url}`, {
-                method: metodo,
-                headers: headers,
-            });
-        }
-
-        if (!response.ok && response.status != 422) {
-            throw new Error(`Ocurrió un error: ${response.status}`);
+        // 422 se deja pasar para que el callback maneje los errores de validación
+        if (!response.ok && response.status !== 422) {
+            throw new Error(`Error del servidor: ${response.status}`);
         }
 
         const respuestaParseada = await response.json();
         callback(null, respuestaParseada);
+
     } catch (error) {
         console.error("[crud.js] Error capturado:", error);
         try {
             callback(error, null);
         } catch (callbackError) {
-            console.error("[crud.js] El callback lanzó un error (falta verificar el parámetro 'error' antes de acceder a 'response'):", callbackError);
+            console.error("[crud.js] El callback lanzó un error — recuerda verificar el parámetro 'error' antes de acceder a 'response':", callbackError);
         }
     }
-}
-
-export function crearRegistro(url, datos, callback) {
-    $.ajax({
-        url: url,
-        method: "POST",
-        data: datos,
-        success: function (datos) {
-            callback(null, datos);
-        },
-        error: function (error) {
-            callback(error, null);
-        },
-    });
-}
-
-export function listarRegistros(callback) {
-    $.ajax({
-        url: "listar_nota",
-        method: "POST",
-        dataType: "json",
-        success: function (datos) {
-            callback(null, datos);
-        },
-        error: function (error) {
-            callback(error, null);
-        },
-    });
-}
-
-export function obtenerDatosDeUnRegistro(id, ruta, callback) {
-    $.ajax({
-        url: ruta,
-        type: "POST",
-        data: { id_dato: id },
-        dataType: "JSON",
-        success: function (respuesta) {
-            callback(null, respuesta);
-        },
-        error: function (error) {
-            callback(error, null);
-        },
-    });
-}
-
-export function actualizarRegistro(url, nuevosDatos, callback) {
-    $.ajax({
-        url: url,
-        type: "POST",
-        data: nuevosDatos,
-        dataType: "JSON",
-        success: function (respuesta) {
-            callback(null, respuesta);
-        },
-        error: function (error) {
-            callback(error, null);
-        },
-    });
-}
-
-export function eliminarRegistro(id, ruta, callback) {
-    $.ajax({
-        url: ruta,
-        type: "POST",
-        data: { id_dato: id },
-        dataType: "JSON",
-        success: function (respuesta) {
-            callback(null, respuesta);
-        },
-        error: function (error) {
-            callback(error, null);
-        },
-    });
 }
