@@ -112,13 +112,8 @@ return [
     'preloader' => [
         'enabled' => true,
         'mode' => 'fullscreen',
-        'img' => [
-            'path' => 'assets/img-dasboard/logo.png',
-            'alt' => 'AdminLTE Preloader Image',
-            'effect' => 'animation__shake',
-            'width' => 60,
-            'height' => 60,
-        ],
+        // El contenido del preloader se define en un @section('preloader')
+        // dentro del layout base (administrador/dashboard.blade.php).
     ],
 
     /*

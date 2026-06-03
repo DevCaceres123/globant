@@ -256,6 +256,64 @@
         transform: translateX(1.1rem);
     }
 
+    /* ---- Preloader personalizado (spinner de doble anillo) ---- */
+    .preloader {
+        background-color: var(--bg-app) !important;
+    }
+    .preloader-globant { text-align: center; user-select: none; }
+
+    /* Spinner: dos anillos concéntricos girando en sentidos opuestos */
+    .pl-spinner {
+        position: relative;
+        width: 64px; height: 64px;
+        margin: 0 auto;
+    }
+    .pl-anillo {
+        position: absolute;
+        border-radius: 50%;
+        border: 3px solid transparent;
+    }
+    .pl-anillo-1 {
+        inset: 0;
+        border-top-color: var(--wine);
+        border-right-color: var(--wine);
+        animation: pl-girar 1s linear infinite;
+    }
+    .pl-anillo-2 {
+        inset: 12px;
+        border-bottom-color: var(--gold);
+        border-left-color: var(--gold);
+        animation: pl-girar 1.4s linear infinite reverse;
+    }
+    @keyframes pl-girar { to { transform: rotate(360deg); } }
+
+    .pl-titulo {
+        margin-top: 1.4rem;
+        font-weight: 700; font-size: 1.02rem;
+        color: var(--wine); letter-spacing: 1.5px; text-transform: uppercase;
+    }
+
+    /* Barra de carga indeterminada debajo del título */
+    .pl-barra {
+        position: relative;
+        width: 180px; height: 4px;
+        margin: 1rem auto 0;
+        background: rgba(123, 34, 51, .12);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+    .pl-barra span {
+        position: absolute; top: 0; left: 0; height: 100%;
+        width: 40%; border-radius: 999px;
+        background: linear-gradient(90deg, var(--wine), var(--gold));
+        animation: pl-cargar 1.3s cubic-bezier(.65, 0, .35, 1) infinite;
+    }
+    @keyframes pl-cargar {
+        0%   { left: -40%; width: 40%; }
+        50%  { width: 55%; }
+        100% { left: 100%; width: 40%; }
+    }
+
     /* ---- Banner de bienvenida (página de inicio) ---- */
     .hero-bienvenida {
         position: relative;

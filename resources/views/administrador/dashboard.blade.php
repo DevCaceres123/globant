@@ -19,6 +19,18 @@
     @include('administrador.plantilla_admin.style')
 @endpush
 
+{{-- Preloader personalizado (spinner de doble anillo) que se muestra al cargar cada página --}}
+@section('preloader')
+    <div class="preloader-globant">
+        <div class="pl-spinner">
+            <span class="pl-anillo pl-anillo-1"></span>
+            <span class="pl-anillo pl-anillo-2"></span>
+        </div>
+        <div class="pl-titulo">Sistema de Afiliados</div>
+        <div class="pl-barra"><span></span></div>
+    </div>
+@stop
+
 @section('content')
     {{-- Contenido propio de cada módulo --}}
     @yield('modulo')
