@@ -126,6 +126,7 @@ use Illuminate\Http\Request;
 // Librerías del controlador
 use Exception;
 use App\Models\Afiliado;
+use Illuminate\Support\Facades\DB;
 
 class AfiliadoController extends Controller
 {
@@ -172,7 +173,7 @@ class AfiliadoController extends Controller
     }
 
     /**
-     * Guarda un nuevo registro. Responde JSON { tipo, mensaje }.
+     * Guarda un nuevo registro. Responde JSON { tipo, mensaje } con HTTP 200.
      */
     public function store(Request $request)
     {
@@ -183,35 +184,106 @@ class AfiliadoController extends Controller
                 'ci'        => ['required', 'string', 'unique:afiliados,ci'],
             ]);
 
+            DB::beginTransaction();
+
             Afiliado::create($datos);
 
-            return response()->json([
-                'tipo'    => 'success',
-                'mensaje' => 'Afiliado registrado correctamente.',
-            ]);
+            DB::commit();
+
+            $this->mensaje('exito', 'Afiliado registrado correctamente.');
+            return response()->json($this->mensaje, 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // 422 → el front muestra los errores campo por campo
+            // Errores de validación → el front los pinta campo por campo
             return response()->json(['errors' => $e->errors()], 422);
         } catch (Exception $e) {
-            return response()->json(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+            DB::rollBack();
+            $this->mensaje('error', 'Error ' . $e->getMessage());
+            return response()->json($this->mensaje, 200);
         }
     }
 
+    /**
+     * Actualiza un registro existente. Misma idea que store().
+     */
     public function update(Request $request, string $id)
     {
-        // Misma idea que store(), pero con Afiliado::findOrFail($id)->update(...)
+        try {
+            $afiliado = Afiliado::where('id', $id)->first();
+
+            if (!$afiliado) {
+                throw new Exception('No existe el afiliado');
+            }
+
+            $datos = $request->validate([
+                'nombres'   => ['required', 'string', 'max:100'],
+                'apellidos' => ['required', 'string', 'max:100'],
+                'ci'        => ['required', 'string', 'unique:afiliados,ci,' . $id],
+            ]);
+
+            DB::beginTransaction();
+
+            $afiliado->update($datos);
+
+            DB::commit();
+
+            $this->mensaje('exito', 'Afiliado actualizado correctamente.');
+            return response()->json($this->mensaje, 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (Exception $e) {
+            DB::rollBack();
+            $this->mensaje('error', 'Error ' . $e->getMessage());
+            return response()->json($this->mensaje, 200);
+        }
     }
 
+    /**
+     * Elimina un registro. (Mismo patrón que UsuarioController::destroy)
+     */
     public function destroy(string $id)
     {
-        // Afiliado::findOrFail($id)->delete();  → responder { tipo, mensaje }
+        try {
+            $afiliado = Afiliado::where('id', $id)->first();
+
+            if (!$afiliado) {
+                throw new Exception('No existe el afiliado');
+            }
+
+            DB::beginTransaction();
+
+            $afiliado->delete();
+
+            DB::commit();
+
+            $this->mensaje('exito', 'El registro fue eliminado correctamente');
+            return response()->json($this->mensaje, 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            $this->mensaje('error', 'Error ' . $e->getMessage());
+            return response()->json($this->mensaje, 200);
+        }
+    }
+
+    /**
+     * Helper para estandarizar la respuesta JSON { tipo, mensaje }.
+     * (Mismo patrón que LoginController y UsuarioController)
+     */
+    public function mensaje($titulo, $mensaje)
+    {
+        $this->mensaje = [
+            'tipo'    => $titulo,
+            'mensaje' => $mensaje,
+        ];
     }
 }
 ```
 
-> 💡 La validación que falla devuelve **HTTP 422** con `{ errors: {...} }`. El
-> helper `crud()` está preparado para no romperse con el 422 y dejar que el front
-> pinte los errores (ver helpers más abajo).
+> 💡 **Convención de respuesta del proyecto:** las operaciones de escritura
+> (`store`/`update`/`destroy`) usan **transacciones `DB`** y devuelven SIEMPRE
+> `{ tipo, mensaje }` con **HTTP 200** mediante el helper `$this->mensaje(...)`.
+> El `tipo` puede ser `exito` o `error` (lo entiende `mensajeAlerta`).
+> La validación fallida es la **única** que viaja con **HTTP 422** + `{ errors }`,
+> y `crud()` está preparado para no romperse con ese código.
 
 ### 3.2 Rutas
 
@@ -428,14 +500,61 @@ document.getElementById("formulario_afiliado").addEventListener("submit", functi
             mensajeAlerta("Ocurrió un error", "error");
             return;
         }
-        // Errores de validación (HTTP 422)
+        // Errores de validación (HTTP 422 → { errors: {...} })
         if (respuesta.errors) {
             mensajeAlerta(respuesta.errors, "errores");
             return;
         }
         $("#modal_afiliado").modal("hide");
-        mensajeAlerta(respuesta.mensaje, respuesta.tipo); // "success"
+        mensajeAlerta(respuesta.mensaje, respuesta.tipo); // tipo: "exito" | "error"
         actualizarTabla();
+    });
+});
+
+// 4) Editar: traer un registro (crud GET con id) y rellenar el formulario
+$("#tabla_afiliados tbody").on("click", ".editar_afiliado", function () {
+    const id = $(this).data("id");
+    vaciar_errores("formulario_afiliado");
+
+    crud("afiliados", "GET", id, null, function (error, respuesta) {
+        if (error) {
+            mensajeAlerta("No se pudo cargar el registro", "error");
+            return;
+        }
+        const a = respuesta.data; // ajusta según lo que devuelva tu show()
+        document.getElementById("afiliado_id").value = a.id;
+        document.getElementById("nombres").value = a.nombres;
+        document.getElementById("apellidos").value = a.apellidos;
+        document.getElementById("ci").value = a.ci;
+        document.getElementById("modal_titulo").innerHTML =
+            '<i class="fas fa-edit mr-2"></i> Editar afiliado';
+        $("#modal_afiliado").modal("show");
+    });
+});
+
+// 5) Eliminar: confirmación + crud DELETE
+$("#tabla_afiliados tbody").on("click", ".eliminar_afiliado", function () {
+    const id = $(this).data("id");
+
+    Swal.fire({
+        title: "¿Eliminar afiliado?",
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+    }).then((res) => {
+        if (!res.isConfirmed) return;
+
+        // DELETE: crud usa la rama "id sin datos" con el método indicado
+        crud("afiliados", "DELETE", id, null, function (error, respuesta) {
+            if (error) {
+                mensajeAlerta("Ocurrió un error al eliminar", "error");
+                return;
+            }
+            mensajeAlerta(respuesta.mensaje, respuesta.tipo); // "exito" | "error"
+            actualizarTabla();
+        });
     });
 });
 ```
@@ -459,45 +578,124 @@ array `'menu'`:
 
 ## 4. Helpers de JavaScript reutilizables
 
-Viven en `public/funciones_helper/`. Úsalos en vez de duplicar lógica:
+Viven en `public/funciones_helper/`. Se importan en los JS de módulo (que cargan
+con `type="module"`). **Úsalos en vez de duplicar lógica.**
+
+### 4.1 Tabla de helpers
 
 | Helper | Importar desde | Para qué sirve |
 |--------|----------------|----------------|
-| `crud(url, metodo, id, datos, callback)` | `operaciones_crud/crud.js` | Hace `fetch` con CSRF a `/{url}` o `/{url}/{id}`. Soporta `GET`, `POST`, `PUT`. No revienta con el 422. |
-| `mensajeAlerta(mensaje, tipo)` | `notificaciones/mensajes.js` | Notificaciones con SweetAlert. `tipo`: `success`, `error`, `info`, `warning`, o `errores` (pinta errores de validación en los `div#_campo`). |
-| `vaciar_formulario(idForm)` | `vistas/formulario.js` | Limpia todos los campos de un formulario. |
-| `vaciar_errores(idForm)` | `vistas/formulario.js` | Borra los mensajes de error mostrados. |
+| `crud(url, metodo, id, datos, callback)` | `operaciones_crud/crud.js` | `fetch` con CSRF a `/{url}` o `/{url}/{id}`. Soporta `GET`, `POST`, `PUT` y `DELETE`. No revienta con el 422. |
+| `mensajeAlerta(mensaje, tipo)` | `notificaciones/mensajes.js` | Notificaciones con SweetAlert. Ver tipos abajo. |
+| `toast(icon, mensaje)` | `notificaciones/mensajes.js` | Toast crudo (esquina superior derecha). Normalmente usa `mensajeAlerta`; este es por si necesitas el toast directo. |
+| `vaciar_formulario(idForm)` | `vistas/formulario.js` | Resetea todos los campos del formulario (`.reset()`). |
+| `vaciar_errores(idForm)` | `vistas/formulario.js` | Limpia los `div#_campo` de errores de cada campo del formulario. |
+| `mensajeInputs(mensaje, color, campo)` | `vistas/formulario.js` | Pinta un mensaje (con color) bajo un campo individual. |
+| `expresionesRegulares` | `validar_formulario/validar_formulario.js` | Diccionario de regex listas: `ci`, `nombres`, `apellido`, `correo`, `celular`, `usuario`, `contrasenia`, `fecha`, etc. |
+| `validarCamposDelFormulario(exp, input, msj, campo)` | `validar_formulario/validar_formulario.js` | Valida un campo contra una regex y pinta éxito/error en el input. |
+| `verificarCamposDelFormulario(campos)` | `validar_formulario/validar_formulario.js` | Recorre varios campos y los valida en lote. |
 
-**Firma de `crud()`** (importante):
+### 4.2 Firma y modos de `crud()`
 
 ```js
 crud(url, metodo, idRegistro = null, datos = null, callback)
-//   "afiliados", "POST",  null/id,        {obj},        (err, resp) => {}
+//   "afiliados", "POST",  null/id,        {obj}/null,   (err, resp) => {}
 ```
 
-- `POST` sin id → **crear**.
-- `PUT` con id → **actualizar** (pega a `/afiliados/{id}`).
-- `GET` con id → **traer un registro**.
-- `GET` sin id ni datos → **listar**.
+| Acción | Llamada | Pega a |
+|--------|---------|--------|
+| **Crear**          | `crud("afiliados", "POST", null, datos, cb)` | `POST /afiliados` |
+| **Actualizar**     | `crud("afiliados", "PUT", id, datos, cb)`    | `PUT /afiliados/{id}` |
+| **Traer uno**      | `crud("afiliados", "GET", id, null, cb)`     | `GET /afiliados/{id}` |
+| **Eliminar**       | `crud("afiliados", "DELETE", id, null, cb)`  | `DELETE /afiliados/{id}` |
+| **Listar (índice)**| `crud("afiliados", "GET", null, null, cb)`   | `GET /afiliados` |
 
-> El CSRF lo lee solo desde `<meta name="csrf-token">`, que ya está en el layout.
+- El **CSRF** lo lee solo desde `<meta name="csrf-token">` (ya está en el layout).
+- El callback es `(error, respuesta)`: **siempre comprueba `error` primero**.
+- Si la respuesta trae `respuesta.errors` (validación 422), pásala a
+  `mensajeAlerta(respuesta.errors, "errores")` para pintar los errores por campo.
+
+### 4.3 Tipos de `mensajeAlerta(mensaje, tipo)`
+
+El **segundo parámetro (`tipo`)** decide cómo se muestra. Es el mismo `tipo` que
+devuelve el controlador en `{ tipo, mensaje }`:
+
+| `tipo` | Resultado |
+|--------|-----------|
+| `exito` / `success` | Toast verde de éxito |
+| `info` | Toast informativo |
+| `warning` | Toast de advertencia |
+| `error` | Alerta de error |
+| `errores` | Recorre un objeto `{ campo: mensaje }` y escribe cada error en su `div#_<campo>` |
+
+> Por eso en la vista cada campo lleva un contenedor de error con
+> `id="_<nombre_del_campo>"` (ej: `_nombres`, `_ci`). Así `mensajeAlerta(errors, "errores")`
+> sabe dónde pintar cada mensaje.
 
 ---
 
 ## 5. Permisos y roles (Spatie)
 
-- Se usa **spatie/laravel-permission**. El `User` usa el trait `HasRoles`.
-- En el controlador, verifica permisos con `auth()->user()->can('modulo.accion')`
-  y manda esos permisos al front dentro del JSON del DataTable (campo `permisos`),
-  como hace `UsuarioController::listarUsuarios`.
-- Nomenclatura sugerida de permisos: `<modulo>.<accion>` →
+Se usa **spatie/laravel-permission**. El `User` usa el trait `HasRoles`. El patrón
+de manejo de permisos del proyecto **se ve en `UsuarioController::listarUsuarios`**
+y funciona así:
+
+**Paso 1 — El controlador evalúa los permisos y los manda dentro del JSON del
+DataTable**, en una clave `permisos`:
+
+```php
+return response()->json([
+    'draw'            => $request->draw,
+    'recordsTotal'    => $recordsTotal,
+    'recordsFiltered' => $recordsTotal,
+    'data'            => $datos,
+    'permisos'        => [
+        'editar'   => auth()->user()->can('afiliado.editar'),
+        'eliminar' => auth()->user()->can('afiliado.eliminar'),
+        'estado'   => auth()->user()->can('afiliado.desactivar'),
+    ],
+]);
+```
+
+**Paso 2 — El JS guarda esos permisos en una variable global** (en `dataSrc`) y
+los usa al renderizar las columnas para mostrar u ocultar los botones de acción:
+
+```js
+let permisosGlobal;
+
+// ... dentro de ajax:
+dataSrc: function (json) {
+    permisosGlobal = json.permisos;   // se guardan una vez
+    return json.data;
+},
+
+// ... en la columna de acciones:
+render: function (data, type, row) {
+    let editar = permisosGlobal.editar
+        ? `<a class="btn btn-sm btn-outline-warning editar_afiliado" data-id="${row.id}">
+               <i class="fas fa-pencil-alt"></i></a>`
+        : ``;
+    let eliminar = permisosGlobal.eliminar
+        ? `<a class="btn btn-sm btn-outline-danger eliminar_afiliado" data-id="${row.id}">
+               <i class="fas fa-trash"></i></a>`
+        : ``;
+    return `<div class="d-flex justify-content-center">${editar}${eliminar}</div>`;
+}
+```
+
+- **Nomenclatura de permisos:** `<modulo>.<accion>` →
   `afiliado.ver`, `afiliado.editar`, `afiliado.eliminar`, `afiliado.desactivar`.
 - Los permisos/roles se siembran en los **seeders** (`database/seeders/`). El
   admin por defecto es `usuario: admin` / `password: 1234`.
+- Para **proteger el acceso a una pantalla** (no solo los botones), puedes validar
+  el permiso al inicio del `index()` y redirigir si no lo tiene (hay un ejemplo
+  comentado en `UsuarioController::index`).
 
-> 🧹 **Pendiente conocido:** en `UsuarioController` aún hay permisos con prefijo
-> `sede.*` heredados de otro proyecto. Cuando trabajes ese módulo, renómbralos a
-> `usuario.*`.
+> 🧹 **Pendientes conocidos en `UsuarioController`** (limpiar al trabajar el módulo):
+> - Los permisos usan el prefijo heredado `sede.*` → deberían ser `usuario.*`.
+> - `'eliminar' => true` está fijo (hardcodeado) en vez de evaluar un permiso real.
+> - En `usuario.js` quedó la clase `eliminar_carrera` y el título "Eliminar carrera"
+>   copiados de otro proyecto → renómbralos a `eliminar_usuario`.
 
 ---
 
