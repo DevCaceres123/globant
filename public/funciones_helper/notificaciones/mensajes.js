@@ -1,5 +1,5 @@
 // Toast reutilizable para avisos rápidos (esquina superior derecha)
-const toast = (icon, mensaje = "") => {
+export const toast = (icon, mensaje = "") => {
     Swal.mixin({
         toast: !0,
         position: "top-end",

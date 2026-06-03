@@ -39,7 +39,8 @@ Route::prefix('/admin')->middleware('auth')->group(function () {
     //Ruta para los usuarios
     Route::controller(UsuarioController::class)->group(function () {
         Route::get('usuarios', 'index')->name('usuarios');        
-        Route::get('listarUsuarios', 'listarUsuarios')->name('listarUsuarios');        
+        Route::get('listarUsuarios', 'listarUsuarios')->name('listarUsuarios');
+        Route::resource('usuario', UsuarioController::class);        
     }); 
 });
 

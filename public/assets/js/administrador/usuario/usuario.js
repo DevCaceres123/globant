@@ -1,4 +1,4 @@
-import { mensajeAlerta } from "../../../../funciones_helper/notificaciones/mensajes.js";
+import { mensajeAlerta, toast } from "../../../../funciones_helper/notificaciones/mensajes.js";
 import { crud } from "../../../../funciones_helper/operaciones_crud/crud.js";
 import {
     vaciar_errores,
@@ -45,7 +45,7 @@ function listar_datos() {
                          <div class="celda-usuario">
                                 
                                 <div>
-                                    <div class="nombre">${row.nombres} ${row.apellidos}</div>
+                                    <div class="nombre text-capitalize">${row.nombres} ${row.apellidos}</div>
                                     <div class="correo">${row.email}</div> 
                                 </div>
                         </div>                          
@@ -123,7 +123,7 @@ function listar_datos() {
                         : ``;
 
                     let eliminar = permisosGlobal.eliminar
-                        ? `  <a class="btn btn-sm btn-outline-danger px-2 d-inline-flex align-items-center eliminar_carrera ml-1" data-id="${row.id}" title="Eliminar carrera">
+                        ? `  <a class="btn btn-sm btn-outline-danger px-2 d-inline-flex align-items-center eliminar_usuario ml-1" data-id="${row.id}" title="Eliminar carrera">
                             <i class="fas fa-window-close fs-16"></i>
                         </a>`
                         : ``;
@@ -144,39 +144,42 @@ function actualizarTabla() {
    MODAL: nuevo usuario / mostrar contraseña / switch estado
    ========================================================= */
 
-// Texto Activo/Inactivo según el switch
-const switchEstado = document.getElementById("estado");
-function actualizarLabelEstado() {
-    document.getElementById("estado_label").textContent = switchEstado.checked
-        ? "Activo"
-        : "Inactivo";
-}
-switchEstado.addEventListener("change", actualizarLabelEstado);
 
-// Botón "Nuevo usuario": limpia el formulario y deja el estado en Activo
-document
-    .getElementById("btn_nuevo_usuario")
-    .addEventListener("click", function () {
-        vaciar_formulario("formulario_usuario");
-        vaciar_errores("formulario_usuario");
-        document.getElementById("usuario_id").value = "";
-        document.getElementById("modal_titulo").innerHTML =
-            '<i class="fas fa-user-plus mr-2"></i> Nuevo usuario';
-        switchEstado.checked = true;
-        actualizarLabelEstado();
-    });
 
-// Mostrar / ocultar contraseña
-document
-    .getElementById("toggle_password")
-    .addEventListener("click", function () {
-        const input = document.getElementById("password");
-        const icono = document.getElementById("icono_password");
-        if (input.type === "password") {
-            input.type = "text";
-            icono.classList.replace("fa-eye-slash", "fa-eye");
+// ELIMINAR REGISTRO
+$('#tabla_usuarios').on('click', '.eliminar_usuario', function (e) {
+
+    e.preventDefault(); // Evitar que el enlace recargue la página
+    let id_registro = $(this).data('id'); // Obtener el id 
+
+
+    Swal.fire({
+        title: "NOTA!",
+        text: "¿Está seguro de eliminar el registro?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, Estoy seguro",
+        cancelButtonText: "Cancelar",
+    }).then(async function (result) {
+        if (result.isConfirmed) {
+
+            crud("admin/usuario", "DELETE", id_registro, null, function (error, response) {
+
+                if (error) {
+                    mensajeAlerta("Ocurrió un error al eliminar el registro", "error");
+                    return;
+                }
+                if (response.tipo != "exito") {
+                    mensajeAlerta(response.mensaje, response.tipo);
+                    return;
+                }
+                mensajeAlerta(response.mensaje, response.tipo);
+                actualizarTabla();
+            })
         } else {
-            input.type = "password";
-            icono.classList.replace("fa-eye", "fa-eye-slash");
+            toast('info', 'Se canceló la operación');
         }
-    });
+    })
+});

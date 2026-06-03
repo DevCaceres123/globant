@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 //librerias de el contralador
 use Exception;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends Controller
 {
@@ -104,6 +105,37 @@ class UsuarioController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+
+            $usuario = User::where('id', $id)->first();
+
+            if (!$usuario) {
+                throw new Exception("no existe el usuario");
+            }
+
+            DB::beginTransaction();
+
+            $usuario->delete();
+
+            DB::commit();
+
+            $this->mensaje('exito', "El registro fue eliminado correctamente");
+            return response()->json($this->mensaje, 200);
+        } catch (Exception $e) {
+
+            DB::rollBack();
+            $this->mensaje("error", "Error " . $e->getMessage());
+
+            return response()->json($this->mensaje, 200);
+        }
+    }
+
+     public function mensaje($titulo, $mensaje)
+    {
+
+        $this->mensaje = [
+            'tipo' => $titulo,
+            'mensaje' => $mensaje
+        ];
     }
 }

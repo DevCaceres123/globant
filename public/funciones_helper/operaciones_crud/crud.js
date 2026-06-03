@@ -70,7 +70,12 @@ export async function crud(
         const respuestaParseada = await response.json();
         callback(null, respuestaParseada);
     } catch (error) {
-        callback(error, null);
+        console.error("[crud.js] Error capturado:", error);
+        try {
+            callback(error, null);
+        } catch (callbackError) {
+            console.error("[crud.js] El callback lanzó un error (falta verificar el parámetro 'error' antes de acceder a 'response'):", callbackError);
+        }
     }
 }
 
