@@ -229,3 +229,52 @@ $('#tabla_usuarios').on('click', '.cambiar_estado_usuario', function (e) {
         actualizarTabla();
     });
 });
+
+
+
+/* =========================================================
+   FUNCION: para crear nuevo usuario
+   ========================================================= */
+
+$('#formulario_usuario').on('submit', function (e) {
+    e.preventDefault();
+
+    const btn = $('#btn_guardar_usuario');
+    const formData = new FormData(this);
+    const esEdicion = !!formData.get('id');
+
+    mostrarCarga('.modal-content');
+    btn.prop('disabled', true);
+    vaciar_errores('formulario_usuario');
+
+    if (esEdicion) {
+        crud('admin/usuario', 'PUT', formData.get('id'), formData, function (error, response) {
+            btn.prop('disabled', false);
+            ocultarCarga('.modal-content');
+
+            if (error) { mensajeAlerta('Ocurrió un error al actualizar el usuario.', 'error'); return; }
+              // Se marcara los campos que tienen errores de validacion
+            if (response.tipo === 'errores') { mensajeAlerta(response.mensaje, 'errores'); return; }
+            if (response.tipo !== 'exito') { mensajeAlerta(response.mensaje, response.tipo); return; }
+
+            $('#modal_usuario').modal('hide');
+            vaciar_formulario('formulario_usuario');
+            mensajeAlerta(response.mensaje, response.tipo);
+            actualizarTabla();
+        });
+    } else {
+        crud('admin/usuario', 'POST', null, formData, function (error, response) {
+            btn.prop('disabled', false);
+            ocultarCarga('.modal-content');
+
+            if (error) { mensajeAlerta('Ocurrió un error al crear el usuario.', 'error'); return; }
+            if (response.tipo === 'errores') { mensajeAlerta(response.mensaje, 'errores'); return; }
+            if (response.tipo !== 'exito') { mensajeAlerta(response.mensaje, response.tipo); return; }
+
+            $('#modal_usuario').modal('hide');
+            vaciar_formulario('formulario_usuario');
+            mensajeAlerta(response.mensaje, response.tipo);
+            actualizarTabla();
+        });
+    }
+});

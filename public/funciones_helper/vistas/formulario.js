@@ -16,15 +16,13 @@ export function vaciar_errores(nombre_formulario) {
         const fieldNames = Array.from(elements).map(element => element.name);
 
         fieldNames.forEach(name => {
-            // Quita corchetes si existen en el name
             const cleanName = name.replace(/\[\]$/, '');
-            const errorElement = document.getElementById("_" + cleanName);
-            
-            if (errorElement) {
-                errorElement.innerHTML = '';
-            } else {
-                console.warn(`Elemento de error con ID '_${cleanName}' no encontrado`);
-            }
+
+            const errorElement = document.getElementById('_' + cleanName);
+            if (errorElement) errorElement.innerHTML = '';
+
+            const inputElement = form.querySelector(`[name="${name}"]`);
+            if (inputElement) inputElement.classList.remove('is-invalid');
         });
     } catch (error) {
         console.error("Error en el procesamiento del formulario:", error);

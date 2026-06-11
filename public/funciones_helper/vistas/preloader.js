@@ -13,7 +13,7 @@ export function mostrarCarga(selector) {
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             border-radius: inherit; gap: .6rem;">
-            <div class="spinner-border" style="color: var(--wine); width:2.2rem; height:2.2rem;" role="status"></div>
+            <div class="spinner-border" style="color: var(--wine); width:4.2rem; height:4.2rem;" role="status"></div>
             <span style="font-size:.82rem; font-weight:600; color: var(--wine);">Espere por favor...</span>
         </div>
     `);

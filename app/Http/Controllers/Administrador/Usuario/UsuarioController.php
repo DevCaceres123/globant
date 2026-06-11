@@ -11,9 +11,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Spatie\Permission\Models\Role;
+use App\Http\Requests\Administrador\Usuario\UsuarioRequest;
 
 class UsuarioController extends Controller implements HasMiddleware
 {
+    private $mensaje;
     public static function middleware(): array
     {
         // return [
@@ -29,8 +32,8 @@ class UsuarioController extends Controller implements HasMiddleware
 
     public function index()
     {
-      
-        return view('administrador.administrador.usuario');
+        $rol=Role::select('id', 'name')->get();
+        return view('administrador.administrador.usuario',compact('rol'));
     }
 
 
@@ -42,10 +45,10 @@ class UsuarioController extends Controller implements HasMiddleware
             $query->where(function ($q) use ($request) {
                 $q->where('ci', 'like', '%' . $request->search['value'] . '%')->orWhere('usuario', 'like', '%' . $request->search['value'] . '%')->orWhere
                 ('nombres', 'like', '%' . $request->search['value'] . '%')->orWhere
-                ('apellidos', 'like', '%' . $request->search['value'] . '%')
-                ->orWhereHas('roles', function ($rolQuery) use ($request) {
-                    $rolQuery->where('name', 'like', '%' . $request->search['value'] . '%');
-                });
+                    ('apellidos', 'like', '%' . $request->search['value'] . '%')
+                    ->orWhereHas('roles', function ($rolQuery) use ($request) {
+                        $rolQuery->where('name', 'like', '%' . $request->search['value'] . '%');
+                    });
             });
         }
 
@@ -65,7 +68,7 @@ class UsuarioController extends Controller implements HasMiddleware
                 'editar' => auth()->user()->can('sede.editar'),
                 'eliminar' => true,
                 'estado' => auth()->user()->can('sede.desactivar'),
-                
+
             ],
         ]);
     }
@@ -79,11 +82,35 @@ class UsuarioController extends Controller implements HasMiddleware
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Guardar datos de usuario
      */
-    public function store(Request $request)
+    public function store(UsuarioRequest $request)
     {
+        try {
+            DB::beginTransaction();
 
+            $usuario = User::create([
+                'nombres'   => $request->nombres,
+                'apellidos' => $request->apellidos,
+                'ci'        => $request->ci,
+                'email'     => $request->email,
+                'usuario'   => $request->usuario,
+                'password'  => $request->password,
+                'estado'    => $request->estado,
+            ]);
+
+            $usuario->assignRole($request->rol);
+
+            DB::commit();
+
+            $this->mensaje('exito', 'El usuario fue registrado correctamente.');
+            return response()->json($this->mensaje, 200);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            $this->mensaje('error', 'Error: ' . $e->getMessage());
+            return response()->json($this->mensaje, 200);
+        }
     }
 
     /**
@@ -141,10 +168,10 @@ class UsuarioController extends Controller implements HasMiddleware
     }
 
 
-    public function actualizarEstado(string $id ,Request $request)
+    public function actualizarEstado(string $id, Request $request)
     {
 
-        try {           
+        try {
 
             $usuario = User::find($id);
 
@@ -170,7 +197,7 @@ class UsuarioController extends Controller implements HasMiddleware
         }
     }
 
-     public function mensaje($titulo, $mensaje)
+    public function mensaje($titulo, $mensaje)
     {
 
         $this->mensaje = [

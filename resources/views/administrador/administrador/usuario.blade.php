@@ -158,13 +158,14 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <form id="formulario_usuario" autocomplete="off">
-                @csrf
+                
                 <input type="hidden" name="id" id="usuario_id">
 
                 <div class="modal-header modal-cab">
                     <h5 class="modal-title" id="modal_titulo">
                         <i class="fas fa-user-plus mr-2"></i> Nuevo usuario
                     </h5>
+                    <span class="text-light">Campos obligatorios <strong class="">(*)</strong></span>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -183,32 +184,38 @@
                         <div class="seccion-body">
                             <div class="row">
                                 <div class="col-md-6 form-group">
-                                    <label for="nombres">Nombres</label>
+                                    <label for="nombres">Nombres <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
                                         <input type="text" class="form-control" name="nombres" id="nombres" placeholder="Ingrese los nombres">
                                     </div>
+                                    <div id="_nombres"></div>
+
+                                    
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label for="apellidos">Apellidos</label>
+                                    <label for="apellidos">Apellidos <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
                                         <input type="text" class="form-control" name="apellidos" id="apellidos" placeholder="Ingrese los apellidos">
                                     </div>
+                                    <div id="_apellidos"></div>
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label for="ci">Carnet de identidad (CI)</label>
+                                    <label for="ci">Carnet de identidad (CI) <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-address-card"></i></span></div>
                                         <input type="text" class="form-control" name="ci" id="ci" placeholder="Ingrese el CI">
                                     </div>
+                                    <div id="_ci"></div>
                                 </div>
                                 <div class="col-md-6 form-group mb-0">
-                                    <label for="email">Correo electrónico</label>
+                                    <label for="email">Correo electrónico <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div>
                                         <input type="email" class="form-control" name="email" id="email" placeholder="correo@ejemplo.com">
                                     </div>
+                                    <div id="_email"></div>
                                 </div>
                             </div>
                         </div>
@@ -226,14 +233,15 @@
                         <div class="seccion-body">
                             <div class="row">
                                 <div class="col-md-6 form-group">
-                                    <label for="usuario">Usuario</label>
+                                    <label for="usuario">Usuario <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-at"></i></span></div>
                                         <input type="text" class="form-control" name="usuario" id="usuario" placeholder="Nombre para iniciar sesión">
                                     </div>
+                                    <div id="_usuario"></div>
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label for="password">Contraseña</label>
+                                    <label for="password">Contraseña <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-key"></i></span></div>
                                         <input type="password" class="form-control" name="password" id="password" placeholder="Ingrese la contraseña">
@@ -241,18 +249,20 @@
                                             <span class="input-group-text"><i class="fas fa-eye-slash" id="icono_password"></i></span>
                                         </div>
                                     </div>
+                                    <div id="_password"></div>
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label for="rol">Rol</label>
+                                    <label for="rol">Rol <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user-tag"></i></span></div>
                                         <select class="form-control" name="rol" id="rol">
-                                            <option value="">Seleccione un rol...</option>
-                                            {{-- @foreach($roles as $rol) <option value="{{ $rol->name }}">{{ $rol->name }}</option> @endforeach --}}
-                                            <option value="administrador">administrador</option>
-                                            <option value="operador">operador</option>
+                                            <option disabled selected>Seleccione un rol...</option>
+                                            @foreach($rol as $r)
+                                                <option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
+                                    <div id="_rol"></div>
                                 </div>
                                 <div class="col-md-6 form-group mb-0">
                                     <label for="estado">Estado</label>
@@ -263,6 +273,7 @@
                                             <option value="inactivo">Inactivo</option>
                                         </select>
                                     </div>
+                                    <div id="_estado"></div>
                                 </div>
                             </div>
                         </div>

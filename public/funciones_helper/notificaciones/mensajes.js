@@ -38,36 +38,26 @@ const notificaciones = {
     },
     errores: (obj) => {
         try {
-            //console.log("🔴 Errores recibidos:", obj);
-
             for (let key in obj) {
-                let elementId;
+                const baseKey = key.includes('.') ? key.split('.')[0] : key;
+                const elementId = '_' + baseKey;
+                const errorEl = document.getElementById(elementId);
+                const inputEl = document.querySelector(`[name="${baseKey}"]`);
+                const mensaje = Array.isArray(obj[key]) ? obj[key][0] : obj[key];
 
-                // Si el key tiene un índice (ej: 'planos.0', 'files.2')
-                if (key.includes(".")) {
-                    // Tomamos solo la parte del array antes del punto
-                    const baseKey = key.split(".")[0];
-                    elementId = "_" + baseKey; // todos los errores del array van en el mismo div
+                if (inputEl) inputEl.classList.add('is-invalid');
+
+                if (errorEl) {
+                    errorEl.innerHTML += `
+                        <small class="d-flex align-items-center gap-1 mt-1" style="color:#dc3545;font-size:.78rem">
+                            <i class=" fas fa-exclamation-circle"></i> ${mensaje}
+                        </small>`;
                 } else {
-                    elementId = "_" + key;
-                }
-
-                const element = document.getElementById(elementId);
-
-                if (element) {
-                    console.log(
-                        `✅ Mostrando error en: ${elementId} (key: ${key})`,
-                    );
-                    // Si ya hay errores anteriores, los concatenamos
-                    element.innerHTML += `<p class="text-danger">${obj[key]}</p>`;
-                } else {
-                    console.warn(
-                        `⚠️ No se encontró el elemento con id para: ${key}`,
-                    );
+                    console.warn(`[mensajes.js] Sin div de error para: ${key}`);
                 }
             }
         } catch (error) {
-            console.error("❌ Error procesando los errores:", error);
+            console.error('[mensajes.js] Error procesando errores:', error);
         }
     },
     // Puedes agregar más tipos según sea necesario
