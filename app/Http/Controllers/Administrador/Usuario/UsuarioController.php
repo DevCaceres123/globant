@@ -8,11 +8,14 @@ use Illuminate\Http\Request;
 //librerias que se usan en este controlador
 use Exception;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Spatie\Permission\Models\Role;
 use App\Http\Requests\Administrador\Usuario\UsuarioRequest;
+use Illuminate\Support\Facades\Log;
+use Throwable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UsuarioController extends Controller implements HasMiddleware
 {
@@ -32,8 +35,8 @@ class UsuarioController extends Controller implements HasMiddleware
 
     public function index()
     {
-        $rol=Role::select('id', 'name')->get();
-        return view('administrador.administrador.usuario',compact('rol'));
+        $rol = Role::select('id', 'name')->get();
+        return view('administrador.administrador.usuario', compact('rol'));
     }
 
 
@@ -90,13 +93,13 @@ class UsuarioController extends Controller implements HasMiddleware
             DB::beginTransaction();
 
             $usuario = User::create([
-                'nombres'   => $request->nombres,
+                'nombres' => $request->nombres,
                 'apellidos' => $request->apellidos,
-                'ci'        => $request->ci,
-                'email'     => $request->email,
-                'usuario'   => $request->usuario,
-                'password'  => $request->password,
-                'estado'    => $request->estado,
+                'ci' => $request->ci,
+                'email' => $request->email,
+                'usuario' => $request->usuario,
+                'password' => $request->password,
+                'estado' => $request->estado,
             ]);
 
             $usuario->assignRole($request->rol);
@@ -126,15 +129,77 @@ class UsuarioController extends Controller implements HasMiddleware
      */
     public function edit(string $id)
     {
-        //
+        try {
+
+            $datosUsuario = User::select('id', 'nombres', 'apellidos', 'ci', 'email', 'estado', 'usuario')
+                ->with([
+                    'roles' => function ($query) {
+                        $query->select('id', 'name');
+                    }
+                ])
+                ->find($id);
+
+            if (!$datosUsuario) {
+                throw new Exception('usuario no encontrado.');
+            }
+
+
+            $this->mensaje('exito', $datosUsuario);
+            return response()->json($this->mensaje, 200);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            $this->mensaje('error', 'Error: ' . $e->getMessage());
+            return response()->json($this->mensaje, 200);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UsuarioRequest $request, string $id)
     {
-        //
+        DB::beginTransaction();
+
+        try {
+            $user = User::findOrFail($id);            
+
+            $datos = $request->only(['nombres', 'apellidos', 'ci', 'email', 'usuario', 'estado',]);
+
+            // Solo actualizar la contraseña si se ingresó una nueva
+            if ($request->filled('password')) {
+                $datos['password'] = $request->password;
+            }
+
+            $user->update($datos);
+
+            $user->syncRoles($request->rol);
+
+            DB::commit();
+
+            $this->mensaje('exito', 'Datos actualizados correctamente.');
+
+            return response()->json($this->mensaje, 200);
+
+        } catch (ModelNotFoundException $e) {
+
+            DB::rollBack();
+            $this->mensaje('error', 'Error usuario no encontrado.');
+            return response()->json($this->mensaje, 200);
+
+        } catch (Throwable $e) {
+
+            DB::rollBack();
+            $this->mensaje('error', 'Error: ' . 'ocurrio algun error');
+
+            Log::error('Error generado', [
+                'error_message' => $e->getMessage(),
+                'usuario_id' => auth()->id(),
+                'usuario' => auth()->user()->usuario,
+            ]);
+
+            return response()->json($this->mensaje, 200);
+        }
     }
 
     /**

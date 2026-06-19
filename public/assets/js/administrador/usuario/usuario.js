@@ -9,6 +9,10 @@ import {
 
 let permisosGlobal;
 let tabla;
+const MODO_CREAR = 'crear';
+const MODO_EDITAR = 'editar';
+
+let modoFormulario = MODO_CREAR;
 
 $(document).ready(function () {
     listar_datos();
@@ -233,7 +237,51 @@ $('#tabla_usuarios').on('click', '.cambiar_estado_usuario', function (e) {
 
 
 /* =========================================================
-   FUNCION: para crear nuevo usuario
+   FUNCIONE: para limpiar campos al abrir un modal
+   ========================================================= */
+
+$('#btn_nuevo_usuario').click(function () {
+    modoFormulario = 'crear';
+    vaciar_errores('formulario_usuario');
+    vaciar_formulario('formulario_usuario');
+
+    $('#modal_usuario').modal('show');
+});
+
+
+/* =========================================================
+   FUNCION: para obtener los datos para editar 
+   ========================================================= */
+
+$(document).on("click", ".editar_usuario", function () {
+    $("#modal_usuario").modal("show");
+    vaciar_formulario('formulario_usuario');
+    vaciar_errores('formulario_usuario');
+    mostrarCarga('.modal-content');    
+    let id_campo = $(this).data("id"); // Obtener el id del campo
+    modoFormulario = 'editar';
+    crud("admin/usuario","GET",id_campo + "/edit",null,function (error, response) {
+            // console.log(response);
+            if (error) { mensajeAlerta('Ocurrió un error al actualizar el usuario.', 'error'); return; }
+            
+            $("#usuario_id").val(response.mensaje.id);
+            $("#nombres").val(response.mensaje.nombres);
+            $("#apellidos").val(response.mensaje.apellidos);
+            $("#ci").val(response.mensaje.ci);
+            $("#email").val(response.mensaje.email);
+            $("#usuario").val(response.mensaje.usuario);
+            $("#estado").val(response.mensaje.estado).trigger('change');
+            $("#rol").val(response.mensaje.roles[0].name).trigger('change');
+            
+
+            ocultarCarga('.modal-content');
+            // si todo esta correcto muestra el mensaje de correcto
+        }
+    );
+});
+
+/* =========================================================
+   FUNCION: para crear y editar Usuario
    ========================================================= */
 
 $('#formulario_usuario').on('submit', function (e) {
@@ -241,13 +289,12 @@ $('#formulario_usuario').on('submit', function (e) {
 
     const btn = $('#btn_guardar_usuario');
     const formData = new FormData(this);
-    const esEdicion = !!formData.get('id');
 
     mostrarCarga('.modal-content');
     btn.prop('disabled', true);
     vaciar_errores('formulario_usuario');
 
-    if (esEdicion) {
+    if (modoFormulario === 'editar') {
         crud('admin/usuario', 'PUT', formData.get('id'), formData, function (error, response) {
             btn.prop('disabled', false);
             ocultarCarga('.modal-content');
