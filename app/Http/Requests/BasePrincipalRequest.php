@@ -4,15 +4,17 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Validation\ValidationException;
-
+use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Traits\HasApiResponses;
 class BasePrincipalRequest extends FormRequest
 {
+    use HasApiResponses;
     protected function failedValidation(Validator $validator)
     {
-        throw new ValidationException($validator, response()->json([
-            'tipo'    => 'errores',
-            'mensaje' => $validator->errors(),
-        ], 422));
+
+        throw new HttpResponseException(
+            $this->validationError($validator->errors())
+        );
+
     }
 }

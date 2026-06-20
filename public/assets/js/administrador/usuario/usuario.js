@@ -262,16 +262,16 @@ $(document).on("click", ".editar_usuario", function () {
     modoFormulario = 'editar';
     crud("admin/usuario","GET",id_campo + "/edit",null,function (error, response) {
             // console.log(response);
-            if (error) { mensajeAlerta('Ocurrió un error al actualizar el usuario.', 'error'); return; }
+            if (error) { mensajeAlerta('Ocurrió un error al obtener los datos.', 'error'); return; }
             
-            $("#usuario_id").val(response.mensaje.id);
-            $("#nombres").val(response.mensaje.nombres);
-            $("#apellidos").val(response.mensaje.apellidos);
-            $("#ci").val(response.mensaje.ci);
-            $("#email").val(response.mensaje.email);
-            $("#usuario").val(response.mensaje.usuario);
-            $("#estado").val(response.mensaje.estado).trigger('change');
-            $("#rol").val(response.mensaje.roles[0].name).trigger('change');
+            $("#usuario_id").val(response.datos.id);
+            $("#nombres").val(response.datos.nombres);
+            $("#apellidos").val(response.datos.apellidos);
+            $("#ci").val(response.datos.ci);
+            $("#email").val(response.datos.email);
+            $("#usuario").val(response.datos.usuario);
+            $("#estado").val(response.datos.estado).trigger('change');
+            $("#rol").val(response.datos.roles[0].name).trigger('change');
             
 
             ocultarCarga('.modal-content');

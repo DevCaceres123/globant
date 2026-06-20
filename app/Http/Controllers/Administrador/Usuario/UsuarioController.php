@@ -17,9 +17,13 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+//funciones de apoyo
+use App\Traits\HandlesTransactions;
+use App\Traits\HasApiResponses;
+
 class UsuarioController extends Controller implements HasMiddleware
 {
-    private $mensaje;
+    use HandlesTransactions, HasApiResponses;
     public static function middleware(): array
     {
         // return [
@@ -90,30 +94,25 @@ class UsuarioController extends Controller implements HasMiddleware
     public function store(UsuarioRequest $request)
     {
         try {
-            DB::beginTransaction();
+            return $this->transaction(function () use ($request) {
 
-            $usuario = User::create([
-                'nombres' => $request->nombres,
-                'apellidos' => $request->apellidos,
-                'ci' => $request->ci,
-                'email' => $request->email,
-                'usuario' => $request->usuario,
-                'password' => $request->password,
-                'estado' => $request->estado,
-            ]);
+                $usuario = User::create([
+                    'nombres' => $request->nombres,
+                    'apellidos' => $request->apellidos,
+                    'ci' => $request->ci,
+                    'email' => $request->email,
+                    'usuario' => $request->usuario,
+                    'password' => $request->password,
+                    'estado' => $request->estado,
+                ]);
 
-            $usuario->assignRole($request->rol);
-
-            DB::commit();
-
-            $this->mensaje('exito', 'El usuario fue registrado correctamente.');
-            return response()->json($this->mensaje, 200);
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            $this->mensaje('error', 'Error: ' . $e->getMessage());
-            return response()->json($this->mensaje, 200);
+                $usuario->assignRole($request->rol);
+                return $this->success('El usuario fue registrado correctamente.');
+            });
+        } catch (Throwable $e) {
+            return $this->error('Ocurrió un error inesperado.');
         }
+
     }
 
     /**
@@ -131,26 +130,25 @@ class UsuarioController extends Controller implements HasMiddleware
     {
         try {
 
-            $datosUsuario = User::select('id', 'nombres', 'apellidos', 'ci', 'email', 'estado', 'usuario')
-                ->with([
-                    'roles' => function ($query) {
-                        $query->select('id', 'name');
-                    }
-                ])
-                ->find($id);
+            return $this->transaction(function () use ($id) {
+                $datosUsuario = User::select('id', 'nombres', 'apellidos', 'ci', 'email', 'estado', 'usuario')
+                    ->with([
+                        'roles' => function ($query) {
+                            $query->select('id', 'name');
+                        }
+                    ])
+                    ->findOrFail($id);
 
-            if (!$datosUsuario) {
-                throw new Exception('usuario no encontrado.');
-            }
+                return $this->success('datos obtenidos con exito',$datosUsuario);                
+
+            });
 
 
-            $this->mensaje('exito', $datosUsuario);
-            return response()->json($this->mensaje, 200);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFound('usuario no encontrado.');
 
         } catch (Exception $e) {
-            DB::rollBack();
-            $this->mensaje('error', 'Error: ' . $e->getMessage());
-            return response()->json($this->mensaje, 200);
+            return $this->error('Ocurrió un error inesperado.');
         }
     }
 
@@ -159,46 +157,39 @@ class UsuarioController extends Controller implements HasMiddleware
      */
     public function update(UsuarioRequest $request, string $id)
     {
-        DB::beginTransaction();
-
         try {
-            $user = User::findOrFail($id);            
 
-            $datos = $request->only(['nombres', 'apellidos', 'ci', 'email', 'usuario', 'estado',]);
+            return $this->transaction(function () use ($request, $id) {
 
-            // Solo actualizar la contraseña si se ingresó una nueva
-            if ($request->filled('password')) {
-                $datos['password'] = $request->password;
-            }
+                $user = User::findOrFail($id);
 
-            $user->update($datos);
+                $datos = $request->only([
+                    'nombres',
+                    'apellidos',
+                    'ci',
+                    'email',
+                    'usuario',
+                    'estado',
+                ]);
 
-            $user->syncRoles($request->rol);
+                if ($request->filled('password')) {
+                    $datos['password'] = $request->password;
+                }
 
-            DB::commit();
+                $user->update($datos);
 
-            $this->mensaje('exito', 'Datos actualizados correctamente.');
+                $user->syncRoles($request->rol);
 
-            return response()->json($this->mensaje, 200);
+                return $this->success('Datos actualizados correctamente.');
+
+            });
 
         } catch (ModelNotFoundException $e) {
-
-            DB::rollBack();
-            $this->mensaje('error', 'Error usuario no encontrado.');
-            return response()->json($this->mensaje, 200);
+            return $this->notFound('usuario no encontrado.');
 
         } catch (Throwable $e) {
 
-            DB::rollBack();
-            $this->mensaje('error', 'Error: ' . 'ocurrio algun error');
-
-            Log::error('Error generado', [
-                'error_message' => $e->getMessage(),
-                'usuario_id' => auth()->id(),
-                'usuario' => auth()->user()->usuario,
-            ]);
-
-            return response()->json($this->mensaje, 200);
+            return $this->error('Ocurrió un error inesperado.');
         }
     }
 
@@ -209,65 +200,39 @@ class UsuarioController extends Controller implements HasMiddleware
     {
         try {
 
-            $usuario = User::where('id', $id)->first();
+            return $this->transaction(function () use ($id) {
+                $usuario = User::findOrFail($id);
+                $usuario->delete();
+                return $this->success("El registro fue eliminado correctamente");
 
-            if (!$usuario) {
-                throw new Exception("no existe el usuario");
-            }
+            });
 
-            DB::beginTransaction();
+        } catch (ModelNotFoundException $e) {
+            return $this->notFound('usuario no encontrado.');
 
-            $usuario->delete();
-
-            DB::commit();
-
-            $this->mensaje('exito', "El registro fue eliminado correctamente");
-            return response()->json($this->mensaje, 200);
         } catch (Exception $e) {
-
-            DB::rollBack();
-            $this->mensaje("error", "Error " . $e->getMessage());
-
-            return response()->json($this->mensaje, 200);
+            return $this->error('Ocurrió un error inesperado.');
         }
     }
 
 
     public function actualizarEstado(string $id, Request $request)
     {
-
         try {
 
-            $usuario = User::find($id);
+            return $this->transaction(function () use ($id, $request) {
+                $usuario = User::findOrFail($id);
 
-            if (!$usuario) {
-                throw new Exception("no existe el usuario");
-            }
+                $usuario->estado = $request->estado;
+                $usuario->save();
 
-            DB::beginTransaction();
+                return $this->success("El estado del usuario fue actualizado correctamente");
+            });
+        } catch (ModelNotFoundException $e) {
+            return $this->notFound('usuario no encontrado.');
 
-            $usuario->estado = $request->estado;
-            $usuario->save();
-
-            DB::commit();
-
-            $this->mensaje('exito', "El estado del usuario fue actualizado correctamente");
-            return response()->json($this->mensaje, 200);
         } catch (Exception $e) {
-
-            DB::rollBack();
-            $this->mensaje("error", "Error " . $e->getMessage());
-
-            return response()->json($this->mensaje, 200);
+            return $this->error('Ocurrió un error inesperado.');
         }
-    }
-
-    public function mensaje($titulo, $mensaje)
-    {
-
-        $this->mensaje = [
-            'tipo' => $titulo,
-            'mensaje' => $mensaje
-        ];
     }
 }

@@ -59,7 +59,7 @@ export async function crud(url, metodo, idRegistro = null, datos = null, callbac
         });
 
         // 422 (validación) y 403 (sin permiso) se dejan pasar para que el callback maneje el JSON
-        if (!response.ok && response.status !== 422 && response.status !== 403) {
+        if (!response.ok && response.status !== 422 && response.status !== 403 && response.status !== 404) {
             throw new Error(`Error del servidor: ${response.status}`);
         }
 
