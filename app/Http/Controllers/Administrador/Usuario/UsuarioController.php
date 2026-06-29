@@ -20,10 +20,17 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 //funciones de apoyo
 use App\Traits\HandlesTransactions;
 use App\Traits\HasApiResponses;
-
+use App\Services\UsuarioService;
 class UsuarioController extends Controller implements HasMiddleware
 {
     use HandlesTransactions, HasApiResponses;
+
+    public function __construct(
+        protected UsuarioService $usuarioService
+    ) {
+    }
+
+
     public static function middleware(): array
     {
         // return [
@@ -95,18 +102,10 @@ class UsuarioController extends Controller implements HasMiddleware
     {
         try {
             return $this->transaction(function () use ($request) {
+                $this->usuarioService->crear(
+                    $request->validated()
+                );
 
-                $usuario = User::create([
-                    'nombres' => $request->nombres,
-                    'apellidos' => $request->apellidos,
-                    'ci' => $request->ci,
-                    'email' => $request->email,
-                    'usuario' => $request->usuario,
-                    'password' => $request->password,
-                    'estado' => $request->estado,
-                ]);
-
-                $usuario->assignRole($request->rol);
                 return $this->success('El usuario fue registrado correctamente.');
             });
         } catch (Throwable $e) {
@@ -139,7 +138,7 @@ class UsuarioController extends Controller implements HasMiddleware
                     ])
                     ->findOrFail($id);
 
-                return $this->success('datos obtenidos con exito',$datosUsuario);                
+                return $this->success('datos obtenidos con exito', $datosUsuario);
 
             });
 
@@ -161,24 +160,7 @@ class UsuarioController extends Controller implements HasMiddleware
 
             return $this->transaction(function () use ($request, $id) {
 
-                $user = User::findOrFail($id);
-
-                $datos = $request->only([
-                    'nombres',
-                    'apellidos',
-                    'ci',
-                    'email',
-                    'usuario',
-                    'estado',
-                ]);
-
-                if ($request->filled('password')) {
-                    $datos['password'] = $request->password;
-                }
-
-                $user->update($datos);
-
-                $user->syncRoles($request->rol);
+                $this->usuarioService->actualizar($id, $request->validated());
 
                 return $this->success('Datos actualizados correctamente.');
 
@@ -201,8 +183,8 @@ class UsuarioController extends Controller implements HasMiddleware
         try {
 
             return $this->transaction(function () use ($id) {
-                $usuario = User::findOrFail($id);
-                $usuario->delete();
+
+                $this->usuarioService->eliminar($id);
                 return $this->success("El registro fue eliminado correctamente");
 
             });
@@ -210,22 +192,18 @@ class UsuarioController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return $this->notFound('usuario no encontrado.');
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return $this->error('Ocurrió un error inesperado.');
         }
     }
 
 
-    public function actualizarEstado(string $id, Request $request)
+    public function actualizarEstado(string $id, UsuarioRequest $request)
     {
+        
         try {
-
             return $this->transaction(function () use ($id, $request) {
-                $usuario = User::findOrFail($id);
-
-                $usuario->estado = $request->estado;
-                $usuario->save();
-
+                $this->usuarioService->actualizarEstado($id ,$request->estado);
                 return $this->success("El estado del usuario fue actualizado correctamente");
             });
         } catch (ModelNotFoundException $e) {

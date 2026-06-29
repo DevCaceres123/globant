@@ -106,8 +106,8 @@ function listar_datos() {
                         permisosGlobal["eliminar"] == true
                             ? `
                             <div class="custom-control custom-switch custom-switch-lg cambiar_estado_usuario d-inline-block"
-                                 data-id="${row.id}" data-estado="${row.estado}" style="cursor:pointer">
-                                <input type="checkbox" class="custom-control-input" id="estado_${row.id}" ${estadoChecked}>
+                                 data-id="${row.id}" data-estado="${row.estado}">
+                                <input type="checkbox" class="custom-control-input estado_usuario" id="estado_${row.id}" ${estadoChecked}>
                                 <label class="custom-control-label" for="estado_${row.id}"></label>
                             </div>`
                             : `<span class="text-muted">No permitido</span>`;
@@ -208,7 +208,7 @@ $('#tabla_usuarios').on('click', '.eliminar_usuario', function (e) {
    FUNCION: para desactivar/activar usuario
    ========================================================= */
 
-$('#tabla_usuarios').on('click', '.cambiar_estado_usuario', function (e) {
+$('#tabla_usuarios').on('change', '.estado_usuario', function (e) {
 
     const contenedor = $(this).closest('.cambiar_estado_usuario');
     let id_registro = contenedor.data('id');

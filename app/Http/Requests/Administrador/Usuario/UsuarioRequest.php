@@ -54,6 +54,11 @@ class UsuarioRequest extends BasePrincipalRequest
                     'rol' => 'required|string|exists:roles,name',
                     'estado' => 'required|in:activo,inactivo',
                 ];
+            case 'actualizarEstado':
+                $userId = $this->route('usuario');
+                return [                                                    
+                    'estado' => 'required|in:activo,inactivo',
+                ];
             default:
                 return [];
         }
@@ -81,7 +86,7 @@ class UsuarioRequest extends BasePrincipalRequest
             'rol.required' => 'Debe seleccionar un rol.',
             'rol.exists' => 'El rol seleccionado no existe.',
             'estado.required' => 'El estado es obligatorio.',
-            'estado.in' => 'El estado debe ser activo o inactivo.',                    
+            'estado.in' => 'El estado debe ser activo o inactivo.',
         ];
     }
 }

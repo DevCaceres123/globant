@@ -79,7 +79,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <table id="tabla_usuarios" class="table table-hover w-100">
+            <table id="tabla_usuarios" class="table table-hover w-100 table-striped table-bordered">
                 <thead>
                     <tr>
                         <th style="width: 40px">#</th>
