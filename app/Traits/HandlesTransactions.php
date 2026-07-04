@@ -36,4 +36,26 @@ trait HandlesTransactions
             throw $e;
         }
     }
+
+    protected function transactionNorm(callable $callback)
+    {
+        try {
+            $resultado = $callback();
+            return $resultado;
+
+        } catch (Throwable $e) {
+
+
+            Log::error('Error en transacción', [
+                'mensaje' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine(),
+                'usuario_id' => auth()->id(),
+                'ip' => request()->ip(),
+                'url' => request()->fullUrl(),
+            ]);
+
+            throw $e;
+        }
+    }
 }

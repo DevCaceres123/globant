@@ -342,7 +342,7 @@ return [
                 [
                     'text' => 'Roles',
                     'icon_color' => 'green',
-                    'url' => '#',
+                    'route' => 'roles',
                 ],
 
                 [

@@ -25,9 +25,9 @@ class UsuarioController extends Controller implements HasMiddleware
 {
     use HandlesTransactions, HasApiResponses;
 
-    public function __construct(
-        protected UsuarioService $usuarioService
-    ) {
+    public function __construct(protected UsuarioService $usuarioService)
+    {
+        
     }
 
 
@@ -200,10 +200,10 @@ class UsuarioController extends Controller implements HasMiddleware
 
     public function actualizarEstado(string $id, UsuarioRequest $request)
     {
-        
+
         try {
             return $this->transaction(function () use ($id, $request) {
-                $this->usuarioService->actualizarEstado($id ,$request->estado);
+                $this->usuarioService->actualizarEstado($id, $request->estado);
                 return $this->success("El estado del usuario fue actualizado correctamente");
             });
         } catch (ModelNotFoundException $e) {

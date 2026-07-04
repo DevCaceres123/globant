@@ -1,0 +1,184 @@
+/* =========================================================
+   SISTEMA DE DISEÑO — Componentes reutilizables
+   Bloques usados por varios módulos: tarjetas, botones, badges,
+   tablas, modal, formularios y switches.
+   Depende de los tokens (:root) definidos en base.css.
+   ========================================================= */
+
+/* ---- Tarjetas ---- */
+.card {
+    border: 1px solid var(--line);
+    border-radius: .65rem;
+    box-shadow: 0 2px 12px rgba(123,34,51,.06);
+}
+.card-cab {
+    background: linear-gradient(90deg, var(--wine), var(--wine-soft));
+    border-bottom: 3px solid var(--gold);
+    border-top-left-radius: .65rem;
+    border-top-right-radius: .65rem;
+}
+.card-cab .card-title { color: #fff; font-weight: 600; }
+.card-cab .card-title i { color: rgba(255,255,255,.85); }
+
+/* ---- Tarjetas de resumen (stat cards) ---- */
+.stat-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: .65rem;
+    padding: 1rem 1.15rem;
+    box-shadow: 0 2px 12px rgba(123,34,51,.05);
+    overflow: hidden;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(123,34,51,.12); }
+.stat-card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px; background: var(--wine);
+}
+.stat-card.t-gold::before  { background: var(--gold); }
+.stat-card.t-green::before { background: var(--green); }
+.stat-card.t-red::before   { background: var(--red); }
+
+.stat-card .ic {
+    width: 52px; height: 52px; border-radius: .6rem;
+    display: grid; place-items: center; font-size: 1.25rem; flex-shrink: 0;
+}
+.ic-navy  { background: rgba(123,34,51,.10);  color: var(--wine); }
+.ic-gold  { background: rgba(184,137,59,.14); color: var(--gold); }
+.ic-green { background: rgba(47,138,91,.12);  color: var(--green); }
+.ic-red   { background: rgba(192,57,43,.12);  color: var(--red); }
+
+.stat-card .label { font-size: .72rem; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); font-weight: 600; }
+.stat-card .value { font-size: 1.6rem; font-weight: 700; color: var(--txt); line-height: 1; }
+
+/* ---- Botones ---- */
+.btn-navy { background: var(--wine); border-color: var(--wine); color: #fff; }
+.btn-navy:hover  { background: var(--wine-700); border-color: var(--wine-700); color: #fff; }
+.btn-navy:focus  { box-shadow: 0 0 0 .2rem rgba(123,34,51,.30); color: #fff; }
+.btn-navy i { color: rgba(255,255,255,.85); }
+
+.btn-gold { background: var(--gold); border-color: var(--gold); color: #fff; font-weight: 600; }
+.btn-gold:hover { background: #9c7330; border-color: #9c7330; color: #fff; }
+
+/* Botones de acción cuadrados de la tabla */
+.btn-accion {
+    width: 33px; height: 33px; padding: 0;
+    display: inline-grid; place-items: center;
+    border-radius: .45rem; border: 1px solid var(--line);
+    background: #fff; color: var(--muted);
+    transition: all .15s ease;
+}
+.btn-accion:hover { transform: translateY(-1px); }
+.btn-accion.editar:hover   { background: rgba(123,34,51,.10); color: var(--wine); border-color: transparent; }
+.btn-accion.eliminar:hover { background: rgba(192,57,43,.12); color: var(--red);  border-color: transparent; }
+
+/* ---- Badges tipo pill ---- */
+.badge-soft {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .35em .75em; border-radius: 999px;
+    font-size: .74rem; font-weight: 600;
+}
+.badge-soft::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.badge-soft.activo   { background: rgba(47,138,91,.12); color: var(--green); }
+.badge-soft.inactivo { background: rgba(192,57,43,.12); color: var(--red); }
+
+.badge-rol {
+    display: inline-block; padding: .32em .75em; border-radius: 999px;
+    font-size: .74rem; font-weight: 600;
+    background: rgba(123,34,51,.10); color: var(--wine);
+}
+.badge-rol.sec { background: rgba(154,140,144,.18); color: #6f6266; }
+
+/* ---- Tabla ---- */
+.table thead th {
+    border-top: 0; border-bottom: 2px solid var(--line);
+    font-size: .74rem; text-transform: uppercase; letter-spacing: .4px;
+    color: var(--muted); font-weight: 700; background: #fdfbfb;
+}
+.table td { vertical-align: middle; border-top: 1px solid #f5efef; }
+.table-hover tbody tr:hover { background: rgba(123,34,51,.04); }
+
+.user-tag {
+    font-family: monospace; font-size: .82rem;
+    background: rgba(123,34,51,.07); color: var(--wine);
+    padding: .15rem .45rem; border-radius: .35rem;
+}
+
+/* ---- Celda de usuario (avatar + datos) ---- */
+.avatar-ini {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-weight: 600; font-size: .82rem; color: #fff;
+    background: var(--wine); flex-shrink: 0;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgba(184,137,59,.40);
+}
+.celda-usuario { display: flex; align-items: center; gap: .75rem; }
+.celda-usuario .nombre { font-weight: 600; line-height: 1.15; color: var(--txt); }
+.celda-usuario .correo { font-size: .8rem; color: var(--muted); }
+
+/* ---- Modal ---- */
+.modal-content { border: 0; border-radius: .65rem; overflow: hidden; }
+.modal-cab {
+    background: linear-gradient(90deg, var(--wine), var(--wine-soft));
+    border-bottom: 3px solid var(--gold);
+}
+.modal-cab .modal-title { color: #fff; font-weight: 600; }
+.modal-cab .modal-title i { color: rgba(255,255,255,.85); }
+.modal-cab .close { color: #fff; text-shadow: none; opacity: .9; }
+
+.titulo-seccion { color: var(--wine); font-weight: 700; font-size: .95rem; display: flex; align-items: center; gap: .45rem; }
+.titulo-seccion i { color: var(--gold); }
+
+/* ---- Secciones del modal (bloques diferenciados) ---- */
+.seccion-form {
+    border: 1px solid var(--line);
+    border-radius: .6rem;
+    background: #fff;
+    overflow: hidden;
+}
+.seccion-head {
+    display: flex; align-items: center; gap: .7rem;
+    padding: .7rem 1rem;
+    background: rgba(123,34,51,.05);
+    border-bottom: 1px solid var(--line);
+    border-left: 3px solid var(--wine);
+}
+.seccion-ic {
+    width: 36px; height: 36px; border-radius: .5rem; flex-shrink: 0;
+    display: grid; place-items: center;
+    background: var(--wine); color: #fff; font-size: .9rem;
+}
+.seccion-titulo { display: block; font-weight: 700; color: var(--wine); line-height: 1.1; }
+.seccion-sub    { display: block; font-size: .76rem; color: var(--muted); }
+.seccion-body   { padding: 1rem 1rem .35rem; }
+
+/* ---- Formularios ---- */
+.input-group-text { background: #faf7f5; border-color: var(--line); color: var(--wine); }
+.form-control:focus,
+.custom-select:focus { border-color: var(--wine); box-shadow: 0 0 0 .15rem rgba(123,34,51,.15); }
+
+/* ---- Switch (custom-switch) en vino ---- */
+.custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--wine); border-color: var(--wine);
+}
+.custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 .15rem rgba(123,34,51,.20);
+}
+/* Variante grande */
+.custom-switch-lg { padding-left: 2.85rem; }
+.custom-switch-lg .custom-control-label { line-height: 1.6rem; padding-left: .4rem; }
+.custom-switch-lg .custom-control-label::before {
+    left: -2.85rem; top: .15rem;
+    height: 1.5rem; width: 2.6rem; border-radius: 1rem;
+}
+.custom-switch-lg .custom-control-label::after {
+    top: calc(.15rem + 3px); left: calc(-2.85rem + 3px);
+    height: calc(1.5rem - 6px); width: calc(1.5rem - 6px); border-radius: 50%;
+}
+.custom-switch-lg .custom-control-input:checked ~ .custom-control-label::after {
+    transform: translateX(1.1rem);
+}

@@ -15,8 +15,13 @@
 @extends('adminlte::page')
 
 @push('css')
-    {{-- Estilos globales: sistema de diseño (paleta, tarjetas, badges, etc.) --}}
-    @include('administrador.plantilla_admin.style')
+    {{-- Sistema de diseño global: tokens + chrome (base) y componentes reutilizables.
+         Los estilos propios de cada módulo se cargan aparte con @section('css'). --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/administrador/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/administrador/componentes.css') }}">
+
+    {{-- Token CSRF para las peticiones AJAX (crud.js lo lee del <meta>) --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endpush
 
 {{-- Preloader personalizado (spinner de doble anillo) que se muestra al cargar cada página --}}

@@ -90,6 +90,26 @@ public/assets/js/
 └── administrador/usuario/usuario.js
 ```
 
+Los **estilos** siguen la misma idea que el JS: lo **global** se carga una sola vez
+y lo **propio de cada módulo** va en su archivo:
+
+```
+public/assets/css/
+├── auth/login.css                 (estilos del login)
+└── administrador/
+    ├── base.css        ← tokens :root (paleta) + chrome: sidebar, header, preloader
+    ├── componentes.css ← bloques reutilizables: cards, botones, badges, tabla, modal, forms, switches
+    ├── inicio.css      ← estilos propios de la página de inicio
+    └── rol.css         ← estilos propios del módulo de roles
+```
+
+- `base.css` y `componentes.css` son **globales**: se cargan en TODAS las páginas
+  del panel desde `administrador/dashboard.blade.php` (vía `@push('css')`).
+- El CSS **propio de un módulo** se carga solo en su vista con `@section('css')`.
+
+> ⚠️ **No metas CSS inline (`<style>`) en los Blade.** El sistema de diseño vive en
+> archivos `.css` reales para que sea mantenible.
+
 Y los **helpers reutilizables** (compartidos por todos los módulos) viven en:
 
 ```
@@ -417,9 +437,33 @@ extiende `administrador.dashboard` y usa estas secciones:
 > el helper `mensajeAlerta(errores, 'errores')`.
 
 > 🎨 Las clases de diseño (`stat-card`, `badge-soft`, `badge-rol`, `btn-navy`,
-> `card-cab`, etc.) ya están definidas en
-> `resources/views/administrador/plantilla_admin/style.blade.php`. Reutilízalas;
-> no inventes estilos nuevos salvo que sea necesario.
+> `card-cab`, `seccion-form`, `custom-switch-lg`, etc.) ya están definidas en los
+> CSS globales `public/assets/css/administrador/base.css` y `componentes.css`.
+> Reutilízalas; no inventes estilos nuevos salvo que sea necesario.
+
+**¿Necesitas estilos propios del módulo?** No los pongas inline en el Blade.
+Crea `public/assets/css/administrador/<modulo>.css` y cárgalo con `@section('css')`
+(igual que el `@section('js')`):
+
+```blade
+@extends('administrador.dashboard')
+
+@section('title', 'Módulo de afiliados')
+
+{{-- Estilos propios del módulo --}}
+@section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/administrador/afiliado.css') }}">
+@stop
+
+@section('content_header') ... @stop
+@section('modulo') ... @stop
+```
+
+- Los tokens de color (`--wine`, `--gold`, `--line`, `--txt`, `--muted`…) están
+  en `base.css` y ya están disponibles en tu CSS de módulo — úsalos con
+  `var(--wine)`, no escribas colores "a mano".
+- Regla simple: **estilo reutilizable → `componentes.css`; estilo de un solo
+  módulo → su archivo `<modulo>.css`.**
 
 ### 3.4 JavaScript del módulo
 
@@ -742,6 +786,7 @@ docs: agrega guía de contribución para el equipo
 - [ ] Las rutas están dentro del grupo `/admin` con middleware `auth` y tienen `->name()`.
 - [ ] La vista extiende `administrador.dashboard` y usa `@section('modulo')` y `@section('js')`.
 - [ ] El JS está en `public/assets/js/<modulo>/<vista>/` y carga con `type="module"`.
+- [ ] No dejé CSS inline (`<style>`) en el Blade; los estilos propios están en `public/assets/css/administrador/<modulo>.css` cargado con `@section('css')`, reutilizando los tokens de `base.css`.
 - [ ] Reutilicé los helpers (`crud`, `mensajeAlerta`, `vaciar_*`) en vez de duplicar.
 - [ ] Agregué el ítem al menú en `config/adminlte.php`.
 - [ ] Formateé el PHP: `./vendor/bin/pint`.

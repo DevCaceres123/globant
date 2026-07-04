@@ -16,10 +16,58 @@ class UsuarioSeeder extends Seeder
      */
     public function run(): void
     {
-        $rol1       = new Role();
-        $rol1->name = 'administrador';
-        $rol1->save();
+        // ============================================================
+        // 1) PERMISOS — se generan desde config/permisos.php (fuente única).
+        //    Se aplana grupo -> modulo -> accion en strings "modulo.accion".
+        //    El GRUPO no se guarda: es solo para agrupar en la vista.
+        // ============================================================
+        $nombresPermisos = [];
 
+        foreach (config('permisos.estructura') as $grupo => $modulos) {
+            foreach ($modulos as $modulo => $meta) {
+                foreach ($meta['acciones'] as $accion) {
+                    $nombre = "{$modulo}.{$accion}";           // usuario.crear, rol.ver...
+                    $nombresPermisos[] = $nombre;
+
+                    // firstOrCreate => idempotente: puedes correr el seeder varias veces.
+                    Permission::firstOrCreate([
+                        'name'       => $nombre,
+                        'guard_name' => 'web',
+                    ]);
+                }
+            }
+        }
+
+        // (Opcional) Sincronizar 1:1 con el config: borra permisos huérfanos
+        // que ya NO están en config/permisos.php. Úsalo SOLO en desarrollo,
+        // en producción es peligroso (puede dejar roles sin permisos).
+        // Permission::whereNotIn('name', $nombresPermisos)->delete();
+
+        // ============================================================
+        // 2) ROLES
+        // ============================================================
+        // administrador: recibe TODOS los permisos. Al agregar un módulo
+        // nuevo en el config, lo hereda solo (no hay que tocar este seeder).
+        $administrador = Role::firstOrCreate([
+            'name'       => 'administrador',
+            'guard_name' => 'web',
+            'descripcion' => 'Es para administrarar todos modulos',
+            'color' => '#7b2233',
+        ]);
+        $administrador->syncPermissions(Permission::all());
+
+        // general: rol base sin permisos. Sus permisos se asignan luego
+        // desde el módulo de Roles (UI).
+        $general = Role::firstOrCreate([
+            'name'       => 'general',
+            'guard_name' => 'web',
+            'descripcion' => 'Es para modulos especificos',
+            'color' => '#2f8a5b',
+        ]);
+
+        // ============================================================
+        // 3) USUARIOS
+        // ============================================================
         $usuario = new User();
         $usuario->usuario = 'admin';
         $usuario->password = Hash::make('1234');
@@ -29,9 +77,7 @@ class UsuarioSeeder extends Seeder
         $usuario->estado = 'activo';
         $usuario->email = 'admin@gmail.com';
         $usuario->save();
-
         $usuario->syncRoles(['administrador']);
-
 
         $usuario1 = new User();
         $usuario1->usuario = 'prueba';

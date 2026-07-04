@@ -2,6 +2,11 @@
 
 @section('title', 'Inicio')
 
+{{-- Estilos propios de la página de inicio (banner + accesos rápidos) --}}
+@section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/administrador/inicio.css') }}">
+@stop
+
 @section('content_header')
     <div class="d-flex align-items-center justify-content-between">
         <div>

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Administrador\Usuario\UsuarioController;
+use App\Http\Controllers\Administrador\Rol\RolController;
 use App\Http\Controllers\Resumen\InicioController;
 
 
@@ -42,6 +43,12 @@ Route::prefix('/admin')->middleware('auth')->group(function () {
         Route::get('listarUsuarios', 'listarUsuarios')->name('listarUsuarios');
         Route::patch('actualizarEstado/{id_usuario}', 'actualizarEstado')->name('actualizarEstado');
         Route::resource('usuario', UsuarioController::class);        
+    }); 
+
+    //Ruta para los roles
+    Route::controller(RolController::class)->group(function () {
+        Route::get('roles', 'index')->name('roles');   
+        Route::resource('rol', RolController::class);        
     }); 
 });
 

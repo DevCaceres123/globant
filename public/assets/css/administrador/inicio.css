@@ -1,0 +1,73 @@
+/* =========================================================
+   MÓDULO INICIO — Banner de bienvenida y tarjetas de acceso
+   Estilos propios de la página de inicio (administrador/inicio.blade.php).
+   Depende de los tokens (:root) definidos en base.css.
+   ========================================================= */
+
+/* ---- Banner de bienvenida ---- */
+.hero-bienvenida {
+    position: relative;
+    background: linear-gradient(120deg, var(--wine) 0%, var(--wine-700) 55%, #3d1019 100%);
+    border-radius: .75rem;
+    border-bottom: 3px solid var(--gold);
+    color: #fff;
+    padding: 1.6rem 1.8rem;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(123,34,51,.18);
+}
+/* Círculo decorativo dorado de fondo */
+.hero-bienvenida::after {
+    content: ""; position: absolute; right: -40px; top: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,137,59,.30), transparent 70%);
+}
+.hero-bienvenida .saludo { font-size: 1.55rem; font-weight: 700; line-height: 1.1; margin: 0; }
+.hero-bienvenida .saludo .nombre { color: var(--gold); }
+.hero-bienvenida .sub { color: rgba(255,255,255,.78); margin: .35rem 0 0; font-size: .92rem; }
+.hero-bienvenida .fecha {
+    display: inline-flex; align-items: center; gap: .5rem;
+    margin-top: .9rem; padding: .35rem .85rem;
+    background: rgba(255,255,255,.12); border-radius: 999px;
+    font-size: .82rem; text-transform: capitalize;
+}
+.hero-bienvenida .fecha i { color: var(--gold); }
+.hero-bienvenida .badge-rol-hero {
+    display: inline-block; padding: .3em .8em; border-radius: 999px;
+    background: rgba(255,255,255,.16); color: #fff;
+    font-size: .76rem; font-weight: 600; margin-left: .5rem;
+}
+
+/* ---- Tarjetas de acceso rápido ---- */
+.acceso-card {
+    display: flex; align-items: center; gap: 1rem;
+    background: #fff; border: 1px solid var(--line);
+    border-radius: .65rem; padding: 1.1rem 1.2rem;
+    text-decoration: none; color: inherit;
+    position: relative; overflow: hidden;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    height: 100%;
+}
+.acceso-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(123,34,51,.14);
+    border-color: rgba(123,34,51,.25);
+    color: inherit; text-decoration: none;
+}
+.acceso-card .ac-ic {
+    width: 50px; height: 50px; border-radius: .65rem; flex-shrink: 0;
+    display: grid; place-items: center; font-size: 1.3rem;
+    background: rgba(123,34,51,.10); color: var(--wine);
+}
+.acceso-card .ac-titulo { font-weight: 600; color: var(--txt); line-height: 1.15; }
+.acceso-card .ac-desc   { font-size: .8rem; color: var(--muted); }
+.acceso-card .ac-flecha { margin-left: auto; color: var(--muted); transition: transform .15s ease, color .15s ease; }
+.acceso-card:hover .ac-flecha { transform: translateX(3px); color: var(--wine); }
+
+/* Variante deshabilitada (módulo próximamente) */
+.acceso-card.proximamente { opacity: .65; cursor: default; }
+.acceso-card.proximamente:hover { transform: none; box-shadow: none; border-color: var(--line); }
+.acceso-card .badge-pronto {
+    font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+    background: rgba(184,137,59,.16); color: var(--gold);
+    padding: .15rem .5rem; border-radius: 999px; margin-left: .4rem;
+}
