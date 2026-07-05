@@ -348,7 +348,7 @@ return [
                 [
                     'text' => 'Permisos',
                     'icon_color' => 'green',
-                    'url' => '#',
+                    'route' => 'permisos',
                 ],
             ],
         ],

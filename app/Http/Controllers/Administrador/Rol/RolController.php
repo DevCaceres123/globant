@@ -7,10 +7,8 @@ use Illuminate\Http\Request;
 
 
 //librerias que se usan en este controlador
-use Exception;
+
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use App\Http\Requests\Administrador\Rol\RolRquest;
@@ -101,9 +99,12 @@ class RolController extends Controller implements HasMiddleware
         try {
             return $this->transaction(function () use ($id) {
 
-                $rol = $this->rolService->obtenerRol($id);
+                $rol = $this->rolService->obtenerRolParaEditar($id);
                 return $this->success('Datos obtenidos correctamente.', $rol);
             });
+        } catch (ModelNotFoundException $e) {
+            return $this->notFound('rol no encontrado.');
+
         } catch (Throwable $e) {
             return $this->error('Ocurrió un error inesperado.');
         }
@@ -121,6 +122,9 @@ class RolController extends Controller implements HasMiddleware
                 $this->rolService->actualizar($id, $request->validated());
                 return $this->success('El Rol fue editado correctamente.');
             });
+        } catch (ModelNotFoundException $e) {
+            return $this->notFound('rol no encontrado.');
+
         } catch (Throwable $e) {
             return $this->error('Ocurrió un error inesperado.');
         }
@@ -137,6 +141,9 @@ class RolController extends Controller implements HasMiddleware
                 $this->rolService->eliminar($id);
                 return $this->success('El Rol fue eliminado correctamente.');
             });
+        } catch (ModelNotFoundException $e) {
+            return $this->notFound('rol no encontrado.');
+
         } catch (Throwable $e) {
             return $this->error('Ocurrió un error inesperado.');
         }

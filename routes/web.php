@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Administrador\Usuario\UsuarioController;
 use App\Http\Controllers\Administrador\Rol\RolController;
+use App\Http\Controllers\Administrador\Permiso\PermisoController;
 use App\Http\Controllers\Resumen\InicioController;
 
 
@@ -49,6 +50,12 @@ Route::prefix('/admin')->middleware('auth')->group(function () {
     Route::controller(RolController::class)->group(function () {
         Route::get('roles', 'index')->name('roles');   
         Route::resource('rol', RolController::class);        
+    }); 
+
+    //Ruta para los roles
+    Route::controller(PermisoController::class)->group(function () {
+        Route::get('permisos', 'index')->name('permisos');   
+        Route::resource('permiso', PermisoController::class);        
     }); 
 });
 
