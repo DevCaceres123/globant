@@ -4,7 +4,7 @@ namespace App\Repositories\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
 
-interface UsuarioRepositoryInterface
+interface BaseRepositoryInterface
 {
     public function crear(array $datos): Model;
 

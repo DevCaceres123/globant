@@ -1,11 +1,11 @@
 <?php
-namespace App\Services;
+namespace App\Services\Administracion;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Permission;
 
-class PermisoService extends BaseService
+class PermisoService
 {
 
     /// funcion donde cargaremos el modelo que usaremos.

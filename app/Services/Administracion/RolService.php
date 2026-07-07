@@ -1,5 +1,5 @@
 <?php
-namespace App\Services;
+namespace App\Services\Administracion;
 
 use Spatie\Permission\Models\Role;
 use Illuminate\Database\Eloquent\Model;

@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 //funciones de apoyo
 use App\Traits\HandlesTransactions;
 use App\Traits\HasApiResponses;
-use App\Services\UsuarioService;
+use App\Services\Administracion\UsuarioService;
 class UsuarioController extends Controller implements HasMiddleware
 {
     use HandlesTransactions, HasApiResponses;

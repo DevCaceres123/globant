@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
 
-abstract class BaseService
+abstract class BaseRepository
 {
     protected Model $model;
 
@@ -12,9 +12,8 @@ abstract class BaseService
     {
         $this->model = $this->model();
     }
+
     abstract protected function model(): Model;
-
-
 
     public function crear(array $datos): Model
     {
@@ -26,12 +25,6 @@ abstract class BaseService
         return $this->model->findOrFail($id);
     }
 
-    public function eliminar(int $id): bool
-    {
-        $model = $this->buscarPorId($id);
-        return $model->delete();
-    }
-
     public function actualizar(int $id, array $datos): Model
     {
         $modelo = $this->buscarPorId($id);
@@ -41,11 +34,8 @@ abstract class BaseService
         return $modelo;
     }
 
-    public function listar(array $columnas):Model
+    public function eliminar(int $id): bool
     {
-        $modelo=$this->model->get();
-        return $modelo;
-        
+        return $this->buscarPorId($id)->delete();
     }
-
 }
