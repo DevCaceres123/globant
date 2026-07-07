@@ -46,7 +46,7 @@ class UsuarioController extends Controller implements HasMiddleware
 
     public function index()
     {
-        $rol = Role::select('id', 'name')->get();
+        $rol = $this->usuarioService->obtenerRoles();
         return view('administrador.administrador.usuario', compact('rol'));
     }
 

@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 //funciones de apoyo
 use App\Traits\HandlesTransactions;
 use App\Traits\HasApiResponses;
-use App\Services\RolService;
+use App\Services\Administracion\RolService;
 
 class RolController extends Controller implements HasMiddleware
 {
@@ -47,14 +47,8 @@ class RolController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $roles = Role::select('id', 'name', 'color', 'descripcion', 'updated_at')
-            ->withCount('permissions')
-            ->with([
-                'permissions' => function ($query) {
-                    $query->select('id', 'name');
-                }
-            ])
-            ->get();
+        $roles = $this->rolService->obtenerRolesConPermisos();
+        
         return view('administrador.administrador.rol', compact('roles'));
     }
 

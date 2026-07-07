@@ -61,4 +61,9 @@ class UsuarioService
     {
         return $this->usuarioRepository->eliminar($id);
     }
+
+    public function obtenerRoles()
+    {
+        return $this->usuarioRepository->obtenerRoles();
+    }
 }

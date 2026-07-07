@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use App\Repositories\Contracts\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-interface UsuarioRepositoryInterface extends BaseRepositoryInterface
+interface RolRepositoryInterface extends BaseRepositoryInterface
 {
     public function buscarParaEditar(int $id): Model;
 
-    public function obtenerRoles():collection;
+    public function obtenerRolesConPermisos(): collection;
 }

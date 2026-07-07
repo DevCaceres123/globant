@@ -1,25 +1,23 @@
 <?php
 namespace App\Services\Administracion;
 
+use App\Repositories\Contracts\Administracion\RolRepositoryInterface;
 use Spatie\Permission\Models\Role;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Database\Eloquent\Collection;
+class RolService
+{   
 
-class RolService extends BaseService
-{
-
-    /// funcion donde cargaremos el modelo que usaremos.
-    protected function model(): Role
-    {
-        return new Role();
-    }
+    
+    public function __construct(protected RolRepositoryInterface $rolRepository){}
 
     public function crear(array $datos): Role
     {
         $permisos = $this->extraerPermisos($datos);
 
         /** @var Role $rol */
-        $rol = parent::crear($datos);
+        $rol = $this->rolRepository->crear($datos);
 
         $rol->syncPermissions($permisos ?? []);
 
@@ -29,13 +27,7 @@ class RolService extends BaseService
 
     public function obtenerRolParaEditar(int $id): Role
     {
-        $rol = $this->model->select('id', 'name', 'color', 'descripcion')
-            ->with([
-                'permissions' => function ($query) {
-                    $query->select('id', 'name');
-                }
-            ])
-            ->findOrFail($id);
+        $rol = $this->rolRepository->buscarParaEditar($id);
 
         return $rol;
     }
@@ -44,10 +36,20 @@ class RolService extends BaseService
     {
 
         $permisos = $this->extraerPermisos($datos);
-        $rol = parent::actualizar($id, $datos);
+        $rol = $this->rolRepository->actualizar($id, $datos);
         $rol->syncPermissions($permisos);     
         return $rol;
 
+    }
+
+    public function eliminar(int $id): bool
+    {
+        return $this->rolRepository->eliminar($id);
+    }
+
+    public function obtenerRolesConPermisos(): Collection
+    {
+        return $this->rolRepository->obtenerRolesConPermisos();
     }
 
 

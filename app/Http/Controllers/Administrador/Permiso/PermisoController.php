@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 //funciones de apoyo
 use App\Traits\HandlesTransactions;
 use App\Traits\HasApiResponses;
-use App\Services\PermisoService;
+
 
 class PermisoController extends Controller implements HasMiddleware
 {
@@ -39,7 +39,7 @@ class PermisoController extends Controller implements HasMiddleware
         return [];
     }
 
-    public function __construct(protected PermisoService $permisoService){}
+    
 
     /**
      * Módulo de permisos (SOLO LECTURA).

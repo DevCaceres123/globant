@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Repositories\Contracts\Administracion\UsuarioRepositoryInterface;
 use App\Repositories\BaseRepository;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 
 class UsuarioRepository extends BaseRepository implements UsuarioRepositoryInterface
 {
@@ -25,5 +26,10 @@ class UsuarioRepository extends BaseRepository implements UsuarioRepositoryInter
             ->findOrFail($id);
 
         return $usuario;
+    }
+
+    public function obtenerRoles(): Collection
+    {
+        return User::with('roles')->get();
     }
 }

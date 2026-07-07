@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Contracts\Administracion\UsuarioRepositoryInterface;
 use App\Repositories\Administracion\UsuarioRepository;
+use App\Repositories\Contracts\Administracion\RolRepositoryInterface;
+use App\Repositories\Administracion\RolRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             UsuarioRepositoryInterface::class,
             UsuarioRepository::class
+        );
+
+        // Rol
+        $this->app->bind(
+            RolRepositoryInterface::class,
+            RolRepository::class
         );
     }
 
