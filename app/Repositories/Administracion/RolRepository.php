@@ -15,7 +15,7 @@ class RolRepository extends BaseRepository implements RolRepositoryInterface
         return new Role();
     }
 
-    public function buscarParaEditar(int $id): Role
+    public function buscarConPermisos(int $id): Role
     {
         $rol = Role::select('id', 'name', 'color', 'descripcion')
             ->with([
@@ -39,5 +39,18 @@ class RolRepository extends BaseRepository implements RolRepositoryInterface
             ])->get();
 
         return $roles;
+    }
+
+    public function obtenerRolConPermisos(int $id): Role
+    {
+        $rol = Role::select('id', 'name', 'color', 'descripcion')
+            ->with([
+                'permissions' => function ($query) {
+                    $query->select('id', 'name');
+                }
+            ])
+            ->findOrFail($id);
+
+        return $rol;
     }
 }

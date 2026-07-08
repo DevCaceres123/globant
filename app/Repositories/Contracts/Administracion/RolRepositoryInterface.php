@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface RolRepositoryInterface extends BaseRepositoryInterface
 {
-    public function buscarParaEditar(int $id): Model;
+    public function buscarConPermisos(int $id): Model;
 
     public function obtenerRolesConPermisos(): Collection;
+
 }

@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Eloquent\Collection;
 class RolService
-{   
+{
 
-    
-    public function __construct(protected RolRepositoryInterface $rolRepository){}
+
+    public function __construct(protected RolRepositoryInterface $rolRepository)
+    {
+    }
 
     public function crear(array $datos): Role
     {
@@ -27,7 +29,7 @@ class RolService
 
     public function obtenerRolParaEditar(int $id): Role
     {
-        $rol = $this->rolRepository->buscarParaEditar($id);
+        $rol = $this->rolRepository->buscarConPermisos($id);
 
         return $rol;
     }
@@ -37,13 +39,19 @@ class RolService
 
         $permisos = $this->extraerPermisos($datos);
         $rol = $this->rolRepository->actualizar($id, $datos);
-        $rol->syncPermissions($permisos);     
+        $rol->syncPermissions($permisos);
         return $rol;
 
     }
 
     public function eliminar(int $id): bool
     {
+        $rol = $this->rolRepository->buscarPorId($id);
+
+        if ($rol->users()->exists()) {
+            throw new \Exception('No se puede eliminar el rol porque está asignado a uno o más usuarios.');
+        }
+        return $this->rolRepository->eliminar($id);
         return $this->rolRepository->eliminar($id);
     }
 
