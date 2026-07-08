@@ -4,16 +4,16 @@
 
 
 @section('content_header')
-    <div class="d-flex align-items-center justify-content-between">
-        <div>
-            <h1 class="m-0"><i class="fas fa-users txt-gold mr-2"></i>Usuarios</h1>
-            <small class="text-muted">Administración de cuentas y accesos del sistema</small>
-        </div>
-        <ol class="breadcrumb bg-transparent p-0 m-0">
-            <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Inicio</a></li>
-            <li class="breadcrumb-item active">Usuarios</li>
-        </ol>
+<div class="d-flex align-items-center justify-content-between">
+    <div>
+        <h1 class="m-0"><i class="fas fa-users txt-gold mr-2"></i>Usuarios</h1>
+        <small class="text-muted">Administración de cuentas y accesos del sistema</small>
     </div>
+    <ol class="breadcrumb bg-transparent p-0 m-0">
+        <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Inicio</a></li>
+        <li class="breadcrumb-item active">Usuarios</li>
+    </ol>
+</div>
 @stop
 
 @section('modulo')
@@ -70,10 +70,12 @@
                 <option value="Activo">Activos</option>
                 <option value="Inactivo">Inactivos</option>
             </select>
-            <button type="button" class="btn btn-navy btn-sm" id="btn_nuevo_usuario"
-                data-toggle="modal" data-target="#modal_usuario">
-                <i class="fas fa-plus mr-1"></i> Nuevo usuario
-            </button>
+            @can('usuario.crear')
+                <button type="button" class="btn btn-navy btn-sm" id="btn_nuevo_usuario" data-toggle="modal"
+                    data-target="#modal_usuario">
+                    <i class="fas fa-plus mr-1"></i> Nuevo usuario
+                </button>
+            @endcan
         </div>
     </div>
 
@@ -110,8 +112,8 @@
                         <td class="text-center"><span class="badge-soft activo">Activo</span></td>
                         <td class="text-center">
                             <div class="btn-group">
-                                <button class="btn-accion editar btn-editar" title="Editar"
-                                    data-toggle="modal" data-target="#modal_usuario">
+                                <button class="btn-accion editar btn-editar" title="Editar" data-toggle="modal"
+                                    data-target="#modal_usuario">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button class="btn-accion eliminar btn-eliminar ml-1" title="Eliminar">
@@ -137,8 +139,8 @@
                         <td class="text-center"><span class="badge-soft inactivo">Inactivo</span></td>
                         <td class="text-center">
                             <div class="btn-group">
-                                <button class="btn-accion editar btn-editar" title="Editar"
-                                    data-toggle="modal" data-target="#modal_usuario">
+                                <button class="btn-accion editar btn-editar" title="Editar" data-toggle="modal"
+                                    data-target="#modal_usuario">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button class="btn-accion eliminar btn-eliminar ml-1" title="Eliminar">
@@ -158,10 +160,11 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <form id="formulario_usuario" autocomplete="off">
-                
+
                 <input type="hidden" name="id" id="usuario_id">
 
                 <div class="modal-header modal-cab">
+
                     <h5 class="modal-title" id="modal_titulo">
                         <i class="fas fa-user-plus mr-2"></i> Nuevo usuario
                     </h5>
@@ -186,34 +189,42 @@
                                 <div class="col-md-6 form-group">
                                     <label for="nombres">Nombres <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
-                                        <input type="text" class="form-control" name="nombres" id="nombres" placeholder="Ingrese los nombres">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-user"></i></span></div>
+                                        <input type="text" class="form-control" name="nombres" id="nombres"
+                                            placeholder="Ingrese los nombres">
                                     </div>
                                     <div id="_nombres"></div>
 
-                                    
+
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="apellidos">Apellidos <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
-                                        <input type="text" class="form-control" name="apellidos" id="apellidos" placeholder="Ingrese los apellidos">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-user"></i></span></div>
+                                        <input type="text" class="form-control" name="apellidos" id="apellidos"
+                                            placeholder="Ingrese los apellidos">
                                     </div>
                                     <div id="_apellidos"></div>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="ci">Carnet de identidad (CI) <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-address-card"></i></span></div>
-                                        <input type="text" class="form-control" name="ci" id="ci" placeholder="Ingrese el CI">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-address-card"></i></span></div>
+                                        <input type="text" class="form-control" name="ci" id="ci"
+                                            placeholder="Ingrese el CI">
                                     </div>
                                     <div id="_ci"></div>
                                 </div>
                                 <div class="col-md-6 form-group mb-0">
                                     <label for="email">Correo electrónico <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div>
-                                        <input type="email" class="form-control" name="email" id="email" placeholder="correo@ejemplo.com">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-envelope"></i></span></div>
+                                        <input type="email" class="form-control" name="email" id="email"
+                                            placeholder="correo@ejemplo.com">
                                     </div>
                                     <div id="_email"></div>
                                 </div>
@@ -235,18 +246,23 @@
                                 <div class="col-md-6 form-group">
                                     <label for="usuario">Usuario <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-at"></i></span></div>
-                                        <input type="text" class="form-control" name="usuario" id="usuario" placeholder="Nombre para iniciar sesión">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-at"></i></span></div>
+                                        <input type="text" class="form-control" name="usuario" id="usuario"
+                                            placeholder="Nombre para iniciar sesión">
                                     </div>
                                     <div id="_usuario"></div>
                                 </div>
                                 <div class="col-md-6 form-group">
                                     <label for="password">Contraseña <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-key"></i></span></div>
-                                        <input type="password" class="form-control" name="password" id="password" placeholder="Ingrese la contraseña">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-key"></i></span></div>
+                                        <input type="password" class="form-control" name="password" id="password"
+                                            placeholder="Ingrese la contraseña">
                                         <div class="input-group-append" id="toggle_password" style="cursor:pointer">
-                                            <span class="input-group-text"><i class="fas fa-eye-slash" id="icono_password"></i></span>
+                                            <span class="input-group-text"><i class="fas fa-eye-slash"
+                                                    id="icono_password"></i></span>
                                         </div>
                                     </div>
                                     <div id="_password"></div>
@@ -254,7 +270,8 @@
                                 <div class="col-md-6 form-group">
                                     <label for="rol">Rol <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user-tag"></i></span></div>
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-user-tag"></i></span></div>
                                         <select class="form-control" name="rol" id="rol">
                                             <option disabled selected>Seleccione un rol...</option>
                                             @foreach($rol as $r)
@@ -267,7 +284,8 @@
                                 <div class="col-md-6 form-group mb-0">
                                     <label for="estado">Estado</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-toggle-on"></i></span></div>
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-toggle-on"></i></span></div>
                                         <select class="form-control" name="estado" id="estado">
                                             <option value="activo">Activo</option>
                                             <option value="inactivo">Inactivo</option>
@@ -295,5 +313,5 @@
 @stop
 
 @section('js')
-   <script src="{{ asset('assets/js/administrador/usuario/usuario.js') }}" type="module"></script>
+<script src="{{ asset('assets/js/administrador/usuario/usuario.js') }}" type="module"></script>
 @stop

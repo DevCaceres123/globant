@@ -33,14 +33,14 @@ class UsuarioController extends Controller implements HasMiddleware
 
     public static function middleware(): array
     {
-        // return [
-        //     new Middleware('permission:usuario.listar', only: ['index', 'listarUsuarios']),
-        //     new Middleware('permission:usuario.crear',  only: ['store']),
-        //     new Middleware('permission:usuario.editar', only: ['update']),
-        //     new Middleware('permission:usuario.eliminar', only: ['destroy']),
-        // ];
+        return [
+            new Middleware('permission:usuario.ver', only: ['index', 'listarUsuarios']),
+            new Middleware('permission:usuario.crear',  only: ['store']),
+            new Middleware('permission:usuario.editar', only: ['update', 'edit']),
+            new Middleware('permission:usuario.eliminar', only: ['destroy']),
+            new Middleware('permission:usuario.desactivar', only: ['actualizarEstado']),
+        ];
 
-        return [];
     }
 
 
@@ -79,9 +79,9 @@ class UsuarioController extends Controller implements HasMiddleware
             'recordsFiltered' => $recordsTotal, // Ajustar si hay filtros
             'data' => $sedes,
             'permisos' => [
-                'editar' => auth()->user()->can('sede.editar'),
-                'eliminar' => true,
-                'estado' => auth()->user()->can('sede.desactivar'),
+                'editar' => auth()->user()->can('usuario.editar'),
+                'eliminar' => auth()->user()->can('usuario.eliminar'),
+                'estado' => auth()->user()->can('usuario.desactivar'),
 
             ],
         ]);

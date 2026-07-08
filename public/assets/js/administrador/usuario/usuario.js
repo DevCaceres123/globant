@@ -103,7 +103,7 @@ function listar_datos() {
 
                     // Aquí verificamos el permiso para cambiar el estado
                     let desactivarContent =
-                        permisosGlobal["eliminar"] == true
+                        permisosGlobal["estado"] == true
                             ? `
                             <div class="custom-control custom-switch custom-switch-lg cambiar_estado_usuario d-inline-block"
                                  data-id="${row.id}" data-estado="${row.estado}">
@@ -122,7 +122,7 @@ function listar_datos() {
                 data: null,
                 className: "table-td",
                 render: function (data, type, row) {
-                    let editar = permisosGlobal.eliminar
+                    let editar = permisosGlobal.editar
                         ? `<a class="btn btn-sm btn-outline-warning px-2 d-inline-flex align-items-center editar_usuario me-1" data-id="${row.id}" title="Editar Usuario">
                             <i class="fas fa-pencil-alt fs-16"></i>
                         </a>`
@@ -263,6 +263,7 @@ $(document).on("click", ".editar_usuario", function () {
     crud("admin/usuario","GET",id_campo + "/edit",null,function (error, response) {
             // console.log(response);
             if (error) { mensajeAlerta('Ocurrió un error al obtener los datos.', 'error'); return; }
+            if (response.tipo !== 'exito') { mensajeAlerta(response.mensaje, response.tipo); return; }
             
             $("#usuario_id").val(response.datos.id);
             $("#nombres").val(response.datos.nombres);

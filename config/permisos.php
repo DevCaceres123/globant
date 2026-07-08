@@ -73,7 +73,7 @@ return [
             'inicio' => [
                 'etiqueta' => 'Inicio',
                 'icono'    => 'fas fa-home',
-                'acciones' => ['ver'],
+                'acciones' => [],
             ],
         ],
 

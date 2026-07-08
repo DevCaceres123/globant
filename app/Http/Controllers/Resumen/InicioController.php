@@ -11,9 +11,6 @@ class InicioController extends Controller
 {
     public function index()
     {
-        // if (!auth()->user()->can('sede.inicio')) {
-        //     return redirect()->route('inicio');
-        // }
         $totalUsuarios = User::count();
         $totalRoles = Role::count();
         return view('administrador.inicio', compact('totalUsuarios', 'totalRoles'));

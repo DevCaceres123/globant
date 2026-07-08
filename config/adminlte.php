@@ -327,6 +327,7 @@ return [
             'text' => 'INICIO',
             'url' => '/admin',
             'icon' => 'fas fa-home',
+            
         ],
         ['header' => 'SEGURIDAD'],
         [
@@ -337,6 +338,7 @@ return [
                     'text' => 'Usuarios',
                     'icon_color' => 'green',
                     'route' => 'usuario.index',
+                    'can' => 'usuario.ver',
                 ],
 
                 [
