@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 class LoginController extends Controller
 {
+    private $mensaje = [];
     public function showLogin()
     {
         return view('auth.login');

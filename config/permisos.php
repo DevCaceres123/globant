@@ -55,9 +55,10 @@ return [
     | el seeder lo ignora.
     */
     'grupos' => [
+        'Resumen'        => 'fas fa-home',
         'Administrador' => 'fas fa-user-shield',
-        'Gestión'       => 'fas fa-briefcase',
-        'Reportes'      => 'fas fa-chart-line',
+        // 'Gestión'       => 'fas fa-briefcase',
+        // 'Reportes'      => 'fas fa-chart-line',
     ],
 
     /*
@@ -68,6 +69,13 @@ return [
     | y sus acciones habilitadas.
     */
     'estructura' => [
+        'Resumen' => [
+            'inicio' => [
+                'etiqueta' => 'Inicio',
+                'icono'    => 'fas fa-home',
+                'acciones' => ['ver'],
+            ],
+        ],
 
         'Administrador' => [
             'usuario' => [
@@ -80,23 +88,28 @@ return [
                 'icono'    => 'fas fa-user-tag',
                 'acciones' => ['ver', 'crear', 'editar', 'eliminar'],
             ],
-        ],
-
-        'Gestión' => [
-            'afiliado' => [
-                'etiqueta' => 'Afiliados',
-                'icono'    => 'fas fa-id-card-alt',
-                'acciones' => ['ver', 'crear', 'editar', 'eliminar'],
-            ],
-        ],
-
-        'Reportes' => [
-            'reporte' => [
-                'etiqueta' => 'Reportes',
-                'icono'    => 'fas fa-chart-line',
+            'permiso' => [
+                'etiqueta' => 'Permisos',
+                'icono'    => 'fas fa-key',
                 'acciones' => ['ver'],
             ],
         ],
+
+        // 'Gestión' => [
+        //     'afiliado' => [
+        //         'etiqueta' => 'Afiliados',
+        //         'icono'    => 'fas fa-id-card-alt',
+        //         'acciones' => ['ver', 'crear', 'editar', 'eliminar'],
+        //     ],
+        // ],
+
+        // 'Reportes' => [
+        //     'reporte' => [
+        //         'etiqueta' => 'Reportes',
+        //         'icono'    => 'fas fa-chart-line',
+        //         'acciones' => ['ver'],
+        //     ],
+        // ],
 
     ],
 
