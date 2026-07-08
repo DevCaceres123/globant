@@ -336,19 +336,19 @@ return [
                 [
                     'text' => 'Usuarios',
                     'icon_color' => 'green',
-                    'route' => 'usuarios',
+                    'route' => 'usuario.index',
                 ],
 
                 [
                     'text' => 'Roles',
                     'icon_color' => 'green',
-                    'route' => 'roles',
+                    'route' => 'rol.index',
                 ],
 
                 [
                     'text' => 'Permisos',
                     'icon_color' => 'green',
-                    'route' => 'permisos',
+                    'route' => 'permiso.index',
                 ],
             ],
         ],

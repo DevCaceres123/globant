@@ -39,22 +39,19 @@ Route::prefix('/admin')->middleware('auth')->group(function () {
     //RUTAS PARA EL MODULO DE ADMINISTRADORES
 
     //Ruta para los usuarios
-    Route::controller(UsuarioController::class)->group(function () {
-        Route::get('usuarios', 'index')->name('usuarios');        
+    Route::controller(UsuarioController::class)->group(function () {               
         Route::get('listarUsuarios', 'listarUsuarios')->name('listarUsuarios');
         Route::patch('actualizarEstado/{id_usuario}', 'actualizarEstado')->name('actualizarEstado');
         Route::resource('usuario', UsuarioController::class);        
     }); 
 
     //Ruta para los roles
-    Route::controller(RolController::class)->group(function () {
-        Route::get('roles', 'index')->name('roles');   
+    Route::controller(RolController::class)->group(function () { 
         Route::resource('rol', RolController::class);        
     }); 
 
     //Ruta para los roles
-    Route::controller(PermisoController::class)->group(function () {
-        Route::get('permisos', 'index')->name('permisos');   
+    Route::controller(PermisoController::class)->group(function () {  
         Route::resource('permiso', PermisoController::class);        
     }); 
 });

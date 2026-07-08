@@ -10,5 +10,5 @@ interface RolRepositoryInterface extends BaseRepositoryInterface
 {
     public function buscarParaEditar(int $id): Model;
 
-    public function obtenerRolesConPermisos(): collection;
+    public function obtenerRolesConPermisos(): Collection;
 }
