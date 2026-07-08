@@ -345,6 +345,7 @@ return [
                     'text' => 'Roles',
                     'icon_color' => 'green',
                     'route' => 'rol.index',
+                    'can' => 'rol.ver',
                 ],
 
                 [

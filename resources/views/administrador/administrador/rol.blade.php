@@ -29,10 +29,13 @@
             <i class="fas fa-list mr-1"></i> Listado de roles
         </h3>
         <div class="card-tools d-flex align-items-center" style="gap:.5rem">
+            @can('rol.crear')
             <button type="button" class="btn btn-navy btn-sm" id="btn_nuevo_rol" data-toggle="modal"
                 data-target="#modal_rol">
                 <i class="fas fa-plus mr-1"></i> Nuevo rol
             </button>
+            @endcan
+            
         </div>
     </div>
 
@@ -93,15 +96,22 @@
                                     class="far fa-clock"></i>{{ $rol->updated_at ? $rol->updated_at->diffForHumans() : 'Nuevo' }}
                             </span>
                             <div class="acciones-rapidas">
+                                @can('rol.editar')
                                 <button class="btn-accion editar-rol" data-id="{{ $rol->id }}" title="Editar">
                                     <i class="fas fa-pen"></i>
                                 </button>
+                                @endcan
+                                @can('rol.visualizar')
+                                
                                 <button class="btn-accion ver-rol" data-id="{{ $rol->id }}" title="Visualizar">
                                     <i class="fas fa-eye"></i>
                                 </button>
+                                @endcan
+                                @can('rol.eliminar')    
                                 <button class="btn-accion eliminar-rol" data-id="{{ $rol->id }}" title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                @endcan
                             </div>
                         </div>
                     </div>

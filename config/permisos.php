@@ -45,6 +45,7 @@ return [
         'editar'     => 'Editar',
         'eliminar'   => 'Eliminar',
         'desactivar' => 'Activar / Desactivar',
+        'visualizar'  => 'Visualizar',
     ],
 
     /*
@@ -86,7 +87,7 @@ return [
             'rol' => [
                 'etiqueta' => 'Roles',
                 'icono'    => 'fas fa-user-tag',
-                'acciones' => ['ver', 'crear', 'editar', 'eliminar'],
+                'acciones' => ['ver', 'crear', 'editar', 'eliminar', 'visualizar'],
             ],
             'permiso' => [
                 'etiqueta' => 'Permisos',

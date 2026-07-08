@@ -32,14 +32,15 @@ class RolController extends Controller implements HasMiddleware
 
     public static function middleware(): array
     {
-        // return [
-        //     new Middleware('permission:usuario.listar', only: ['index', 'listarUsuarios']),
-        //     new Middleware('permission:usuario.crear',  only: ['store']),
-        //     new Middleware('permission:usuario.editar', only: ['update']),
-        //     new Middleware('permission:usuario.eliminar', only: ['destroy']),
-        // ];
+        return [
+            new Middleware('permission:rol.ver', only: ['index']),
+            new Middleware('permission:rol.crear', only: ['store']),
+            new Middleware('permission:rol.editar', only: ['update', 'edit']),
+            new Middleware('permission:rol.eliminar', only: ['destroy']),
+            new Middleware('permission:rol.visualizar', only: ['show']),
+        ];
 
-        return [];
+
     }
 
     /**
@@ -48,7 +49,7 @@ class RolController extends Controller implements HasMiddleware
     public function index()
     {
         $roles = $this->rolService->obtenerRolesConPermisos();
-        
+
         return view('administrador.administrador.rol', compact('roles'));
     }
 
@@ -81,7 +82,19 @@ class RolController extends Controller implements HasMiddleware
      */
     public function show(string $id)
     {
-        //
+        try {
+            return $this->transaction(function () use ($id) {
+
+                $rol = $this->rolService->obtenerRolParaEditar($id);
+                return $this->success('Datos obtenidos correctamente.', $rol);
+            });
+        } catch (ModelNotFoundException $e) {
+            return $this->notFound('rol no encontrado.');
+
+        } catch (Throwable $e) {
+            return $this->error('Ocurrió un error inesperado.');
+        }
+
     }
 
     /**

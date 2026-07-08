@@ -137,11 +137,13 @@ function modoSoloLectura(activo) {
 
 function cargarRol(id) {
     mostrarCarga('.modal-content');
+    let verOeditar;
+    modoFormulario === 'editar' ? verOeditar = '/edit' : verOeditar = null;
 
-    crud("admin/rol", "GET", id + "/edit", null, function (error, response) {
+    crud("admin/rol", "GET", id + verOeditar, null, function (error, response) {
         // El rol viene envuelto por el helper success(): { tipo, mensaje, datos }
-        if (error) { mensajeAlerta('Ocurrió un error al obtener los datos.', 'error'); ocultarCarga('.modal-content'); return; }
-        if (response.tipo !== 'exito') { mensajeAlerta(response.mensaje, response.tipo); ocultarCarga('.modal-content'); return; }
+        if (error) { mensajeAlerta('Ocurrió un error al obtener los datos.', 'error'); return; }
+        if (response.tipo !== 'exito') { mensajeAlerta(response.mensaje, response.tipo); return; }
 
         const rol = response.datos;
 
