@@ -29,14 +29,12 @@ class PermisoController extends Controller implements HasMiddleware
 
     public static function middleware(): array
     {
-        // return [
-        //     new Middleware('permission:usuario.listar', only: ['index', 'listarUsuarios']),
+        return [
+            new Middleware('permission:permiso.ver', only: ['index']),
         //     new Middleware('permission:usuario.crear',  only: ['store']),
         //     new Middleware('permission:usuario.editar', only: ['update']),
         //     new Middleware('permission:usuario.eliminar', only: ['destroy']),
-        // ];
-
-        return [];
+        ];
     }
 
     

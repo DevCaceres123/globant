@@ -352,6 +352,7 @@ return [
                     'text' => 'Permisos',
                     'icon_color' => 'green',
                     'route' => 'permiso.index',
+                    'can' => 'permiso.ver',
                 ],
             ],
         ],
