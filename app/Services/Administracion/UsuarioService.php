@@ -59,6 +59,10 @@ class UsuarioService
 
     public function eliminar(int $id): bool
     {
+        if ($id === auth()->id()) {
+            throw new \Exception('No puedes eliminar tu propio usuario.');
+        }
+
         return $this->usuarioRepository->eliminar($id);
     }
 
