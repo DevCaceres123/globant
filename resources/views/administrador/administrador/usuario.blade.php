@@ -65,10 +65,10 @@
             <i class="fas fa-list mr-1"></i> Listado de usuarios
         </h3>
         <div class="card-tools d-flex align-items-center" style="gap:.5rem">
-            <select id="filtro_estado" class="form-control form-control-sm" style="width:auto">
+            <select id="filtro_estado" name="filtro_estado" class="form-control form-control-sm" style="width:auto">
                 <option value="">Todos los estados</option>
-                <option value="Activo">Activos</option>
-                <option value="Inactivo">Inactivos</option>
+                <option value="activo">Activos</option>
+                <option value="inactivo">Inactivos</option>
             </select>
             @can('usuario.crear')
                 <button type="button" class="btn btn-navy btn-sm" id="btn_nuevo_usuario" data-toggle="modal"

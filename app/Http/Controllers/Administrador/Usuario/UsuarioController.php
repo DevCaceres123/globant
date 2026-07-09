@@ -59,6 +59,8 @@ class UsuarioController extends Controller implements HasMiddleware
     {
         $query = User::with(['roles'])->select('id', 'usuario', 'ci', 'nombres', 'apellidos', 'estado', 'email')->orderBy('id', 'desc');
 
+        $estado = $request->input('estado') ?? null;
+
         if (!empty($request->search['value'])) {
             $query->where(function ($q) use ($request) {
                 $q->where('ci', 'like', '%' . $request->search['value'] . '%')->orWhere('usuario', 'like', '%' . $request->search['value'] . '%')->orWhere
@@ -68,6 +70,10 @@ class UsuarioController extends Controller implements HasMiddleware
                         $rolQuery->where('name', 'like', '%' . $request->search['value'] . '%');
                     });
             });
+        }
+
+        if ($estado === 'activo' || $estado === 'inactivo') {
+            $query->where('estado', $estado);
         }
 
         // Total de registros antes del filtrado

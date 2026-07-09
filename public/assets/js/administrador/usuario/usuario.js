@@ -14,6 +14,8 @@ const MODO_EDITAR = 'editar';
 
 let modoFormulario = MODO_CREAR;
 
+let valorSeleccionado;
+
 $(document).ready(function () {
     listar_datos();
 });
@@ -26,6 +28,9 @@ function listar_datos() {
         ajax: {
             url: "listarUsuarios", // Ruta que recibe la solicitud en el servidor
             type: "GET", // Método de la solicitud (GET o POST)
+            data: function (d) {
+                d.estado = valorSeleccionado;
+            },
             dataSrc: function (json) {
                 permisosGlobal = json.permisos;
                 // console.log(permisosGlobal); // Guardar los permisos para usarlos en las columnas
@@ -138,6 +143,15 @@ function listar_datos() {
                 },
             },
         ],
+    });
+
+     // Escuchar el event de cambio en el 
+    $('#filtro_estado').on('change', function () {
+        // Obtener el valor seleccionado
+        valorSeleccionado = $(this).val(); // Obtiene el valor (attribute value)
+        tabla.ajax.reload();
+        // Mostrar en la consola los valores obtenidos
+
     });
 }
 
