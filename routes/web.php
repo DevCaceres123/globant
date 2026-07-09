@@ -9,7 +9,7 @@ use App\Http\Controllers\Resumen\InicioController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // RUTAS DONDE NO EXISTE EL INICIO DE SESION
