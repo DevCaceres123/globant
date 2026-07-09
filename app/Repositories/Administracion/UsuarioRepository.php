@@ -33,4 +33,24 @@ class UsuarioRepository extends BaseRepository implements UsuarioRepositoryInter
     {
         return Role::select('id', 'name')->get();
     }
+
+
+    public function obtenerTotal(): int
+    {
+        return User::count();
+    }
+
+    public function obtenerTotalActivos(): int
+    {
+        return User::where('estado', 'activo')->count();
+    }
+
+    public function obtenerTotalInactivos(): int
+    {
+        return User::where('estado', 'inactivo')->count();
+    }
+    public function obtenerTotalRoles(): int
+    {
+        return Role::count();
+    }
 }

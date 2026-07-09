@@ -70,4 +70,25 @@ class UsuarioService
     {
         return $this->usuarioRepository->obtenerRoles();
     }
+
+    public function obtenerTotalUsuarios(): int
+    {
+        return $this->usuarioRepository->obtenerTotal();
+    }
+
+
+    public function obtenerTotalUsuariosActivos(): int
+    {
+        return $this->usuarioRepository->obtenerTotalActivos();
+    } 
+
+    public function obtenerTotalUsuariosInactivos(): int
+    {
+        return $this->usuarioRepository->obtenerTotalInactivos();
+    }
+
+    public function obtenerTotalRoles(): int
+    {
+        return $this->usuarioRepository->obtenerTotalRoles();
+    }
 }

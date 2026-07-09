@@ -47,7 +47,11 @@ class UsuarioController extends Controller implements HasMiddleware
     public function index()
     {
         $rol = $this->usuarioService->obtenerRoles();
-        return view('administrador.administrador.usuario', compact('rol'));
+        $totalUsuarios = $this->usuarioService->obtenerTotalUsuarios();
+        $totalUsuariosActivos = $this->usuarioService->obtenerTotalUsuariosActivos();
+        $totalUsuariosInactivos = $this->usuarioService->obtenerTotalUsuariosInactivos();
+        $totalRoles = $this->usuarioService->obtenerTotalRoles();
+        return view('administrador.administrador.usuario', compact('rol','totalUsuarios','totalUsuariosActivos','totalUsuariosInactivos','totalRoles'));
     }
 
 

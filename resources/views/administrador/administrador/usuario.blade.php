@@ -25,7 +25,7 @@
             <div class="ic ic-navy"><i class="fas fa-users"></i></div>
             <div class="meta">
                 <div class="label">Total usuarios</div>
-                <div class="value">2</div>
+                <div class="value">{{ $totalUsuarios }}</div>
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@
             <div class="ic ic-green"><i class="fas fa-user-check"></i></div>
             <div class="meta">
                 <div class="label">Activos</div>
-                <div class="value">1</div>
+                <div class="value">{{ $totalUsuariosActivos }}</div>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@
             <div class="ic ic-red"><i class="fas fa-user-slash"></i></div>
             <div class="meta">
                 <div class="label">Inactivos</div>
-                <div class="value">1</div>
+                <div class="value">{{ $totalUsuariosInactivos }}</div>
             </div>
         </div>
     </div>
@@ -52,7 +52,7 @@
             <div class="ic ic-gold"><i class="fas fa-user-tag"></i></div>
             <div class="meta">
                 <div class="label">Roles</div>
-                <div class="value">2</div>
+                <div class="value">{{ $totalRoles }}</div>
             </div>
         </div>
     </div>
